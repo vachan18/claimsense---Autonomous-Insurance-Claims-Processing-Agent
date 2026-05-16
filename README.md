@@ -226,7 +226,7 @@ claimsense-v4.html
 
 ## 👤 Author
 
-  ##Vachan U S 
+  Vachan U S 
 - GitHub: https://github.com/vachan18
 - Email: vachanus@email.com
 - ph no: 9886323678
