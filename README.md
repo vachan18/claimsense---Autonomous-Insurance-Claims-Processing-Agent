@@ -1,4 +1,5 @@
 # claimsense---Autonomous-Insurance-Claims-Processing-Agent
+
 # ClaimSense v4 — Autonomous FNOL Intelligence Platform
 
 ## LIVE DEPLOYMENT LINK - https://claimsense.netlify.app/
@@ -222,3 +223,17 @@ claimsense-v4.html
 | v2 | Batch processing, analytics dashboard, history |
 | v3 | Multi-provider AI (OpenAI, Groq, Gemini), API Settings page, Save button |
 | **v4** | Light/dark theme, persistent history, inline editing, fraud risk meter, claim comparison, print export, keyboard shortcuts |
+
+## 👤 Author
+
+  Vachan U S 
+- GitHub: https://github.com/vachan18
+- Email: vachanus@email.com
+- ph no: 9886323678
+
+---
+
+## 📄 License
+
+MIT License — free to use, fork, and build upon.
+
