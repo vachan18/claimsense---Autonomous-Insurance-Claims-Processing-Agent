@@ -1,0 +1,2506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>ClaimSense v3 — Autonomous FNOL Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06060f;--bg2:#0c0c1a;--bg3:#111122;--bg4:#181830;
+  --accent:#7c6df0;--accent2:#b8acff;--accent3:rgba(124,109,240,0.10);
+  --accent-glow:rgba(124,109,240,0.35);
+  --fast:#00e5a0;--fast-dim:rgba(0,229,160,0.08);
+  --red:#ff3d5a;--red-dim:rgba(255,61,90,0.08);
+  --blue:#22d3ee;--blue-dim:rgba(34,211,238,0.08);
+  --amber:#f59e0b;--amber-dim:rgba(245,158,11,0.08);
+  --text:#ece9ff;--text2:#8888aa;--text3:#2e2e52;
+  --border:rgba(255,255,255,0.055);--border2:rgba(255,255,255,0.10);
+  --border-accent:rgba(124,109,240,0.22);
+  --font-head:'Fraunces',serif;
+  --font-body:'Space Grotesk',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --r:12px;--sidebar:236px;
+}
+html{font-size:14px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);display:flex;min-height:100vh;overflow-x:hidden}
+
+/* Grid overlay */
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,109,240,.014) 1px,transparent 1px),linear-gradient(90deg,rgba(124,109,240,.014) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+
+/* ══ SPLASH ══ */
+#splash{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .7s cubic-bezier(.4,0,.2,1),transform .7s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+}
+#splash.hide{opacity:0;transform:scale(1.05) translateY(-10px);pointer-events:none}
+
+/* Animated mesh background on splash */
+#splash-mesh{
+  position:absolute;inset:0;pointer-events:none;overflow:hidden;
+}
+.mesh-orb{
+  position:absolute;border-radius:50%;filter:blur(80px);opacity:.18;animation:meshFloat linear infinite;
+}
+.mesh-orb:nth-child(1){width:600px;height:600px;background:radial-gradient(circle,#7c6df0,transparent 70%);top:-200px;left:-150px;animation-duration:18s;animation-direction:alternate}
+.mesh-orb:nth-child(2){width:500px;height:500px;background:radial-gradient(circle,#00e5a0,transparent 70%);bottom:-150px;right:-100px;animation-duration:22s;animation-direction:alternate-reverse}
+.mesh-orb:nth-child(3){width:350px;height:350px;background:radial-gradient(circle,#22d3ee,transparent 70%);top:30%;left:60%;animation-duration:15s;animation-direction:alternate}
+@keyframes meshFloat{0%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,20px) scale(1.08)}100%{transform:translate(-20px,40px) scale(.95)}}
+
+/* Splash grid overlay */
+#splash::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(124,109,240,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(124,109,240,.025) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}
+
+/* Scanline */
+.scanline{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(124,109,240,.6) 30%,rgba(124,109,240,1) 50%,rgba(124,109,240,.6) 70%,transparent 100%);animation:scanMove 3s ease-in-out infinite;opacity:0;z-index:3;box-shadow:0 0 8px rgba(124,109,240,.5)}
+@keyframes scanMove{0%{top:0;opacity:0}5%{opacity:.7}95%{opacity:.7}100%{top:100%;opacity:0}}
+
+.splash-inner{display:flex;flex-direction:column;align-items:center;gap:3rem;position:relative;z-index:4;width:380px}
+
+/* Logo area */
+.splash-logo-wrap{position:relative;display:flex;align-items:center;justify-content:center;width:120px;height:120px}
+
+/* Outer orbital rings */
+.orb-ring{position:absolute;border-radius:50%;border:1px solid rgba(124,109,240,.15);animation:orbRingPulse ease-out infinite;top:50%;left:50%;transform:translate(-50%,-50%)}
+.orb-ring:nth-child(1){width:140px;height:140px;animation-duration:3s;animation-delay:0s}
+.orb-ring:nth-child(2){width:180px;height:180px;animation-duration:3s;animation-delay:.7s;border-color:rgba(124,109,240,.08)}
+.orb-ring:nth-child(3){width:230px;height:230px;animation-duration:3s;animation-delay:1.4s;border-color:rgba(124,109,240,.05)}
+@keyframes orbRingPulse{0%{opacity:.8;transform:translate(-50%,-50%) scale(.75)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.05)}}
+
+/* Spinning arc around logo */
+.spin-arc{position:absolute;width:100px;height:100px;border-radius:50%;border:2px solid transparent;border-top:2px solid rgba(124,109,240,.6);border-right:2px solid rgba(124,109,240,.2);animation:arcSpin 2.5s linear infinite;top:50%;left:50%;transform:translate(-50%,-50%)}
+.spin-arc-2{position:absolute;width:114px;height:114px;border-radius:50%;border:1px solid transparent;border-bottom:1px solid rgba(0,229,160,.4);animation:arcSpin 4s linear infinite reverse;top:50%;left:50%;transform:translate(-50%,-50%)}
+@keyframes arcSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+
+/* The logo box */
+.splash-logo-box{
+  width:76px;height:76px;border-radius:18px;
+  background:linear-gradient(145deg,#1e1b3a,#0e0c22);
+  border:1px solid rgba(124,109,240,.4);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 1px rgba(124,109,240,.1),0 0 40px rgba(124,109,240,.25),inset 0 1px 0 rgba(255,255,255,.06);
+  animation:logoBoxIn .6s cubic-bezier(.34,1.56,.64,1) both;
+  position:relative;z-index:2;
+}
+@keyframes logoBoxIn{from{opacity:0;transform:scale(.4) rotate(-15deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+
+/* Realistic shield icon in logo */
+.logo-shield{width:38px;height:38px}
+
+.logo-glow{
+  position:absolute;width:60px;height:60px;border-radius:14px;
+  background:radial-gradient(circle,rgba(124,109,240,.4),transparent 70%);
+  animation:glowPulse 2s ease-in-out infinite alternate;filter:blur(8px);z-index:1;
+}
+@keyframes glowPulse{from{opacity:.4;transform:scale(.9)}to{opacity:.9;transform:scale(1.1)}}
+
+/* Particle dots */
+.splash-particle{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:0;animation:particleFly ease-out infinite}
+@keyframes particleFly{0%{opacity:0;transform:translate(0,0) scale(0)}20%{opacity:.8}100%{opacity:0;transform:var(--p-end) scale(1.5)}}
+
+/* Title */
+.splash-title-wrap{display:flex;flex-direction:column;align-items:center;gap:.5rem;animation:titleIn .6s .25s ease both}
+@keyframes titleIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.splash-wordmark{font-family:var(--font-head);font-size:40px;font-weight:900;letter-spacing:-.06em;color:#fff;line-height:1;font-style:italic}
+.splash-wordmark em{font-style:normal;color:var(--accent2)}
+.splash-version{font-family:var(--font-mono);font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--text3);margin-top:2px}
+
+/* Boot console */
+.boot-console{
+  width:100%;background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:10px;overflow:hidden;
+  animation:consoleIn .5s .4s ease both;
+}
+@keyframes consoleIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.console-titlebar{display:flex;align-items:center;gap:6px;padding:.55rem .8rem;background:rgba(255,255,255,.03);border-bottom:1px solid var(--border)}
+.win-btn{width:10px;height:10px;border-radius:50%}
+.win-btn:nth-child(1){background:#ff5f57}
+.win-btn:nth-child(2){background:#febc2e}
+.win-btn:nth-child(3){background:#28c840}
+.console-label{font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:.1em;margin-left:auto;margin-right:auto}
+.console-body{padding:.65rem .8rem;display:flex;flex-direction:column;gap:5px}
+.boot-line{font-family:var(--font-mono);font-size:10px;color:var(--text3);display:flex;align-items:center;gap:8px;opacity:0;letter-spacing:.02em}
+.boot-line.visible{animation:lineIn .3s ease forwards}
+@keyframes lineIn{from{opacity:0;transform:translateX(-5px)}to{opacity:1;transform:none}}
+.boot-ok{color:var(--fast);font-weight:600;flex-shrink:0}
+.boot-warn{color:var(--amber);flex-shrink:0}
+.boot-err{color:var(--red);flex-shrink:0}
+.boot-loader{width:10px;height:10px;border-radius:50%;border:1.5px solid rgba(124,109,240,.2);border-top-color:var(--accent);animation:spin .7s linear infinite;flex-shrink:0}
+
+/* Progress bar */
+.splash-progress-wrap{width:100%;animation:consoleIn .5s .5s ease both}
+.progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.progress-label-txt{font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase}
+.progress-pct{font-family:var(--font-mono);font-size:11px;color:var(--accent2);font-weight:600}
+.progress-track{height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;position:relative}
+.progress-fill{height:100%;border-radius:2px;width:0%;transition:width .45s cubic-bezier(.4,0,.2,1);background:linear-gradient(90deg,var(--accent),var(--accent2));box-shadow:0 0 10px var(--accent)}
+.progress-sheen{position:absolute;top:0;bottom:0;width:40px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:sheen 1.5s ease-in-out infinite;opacity:0}
+@keyframes sheen{0%{left:-40px;opacity:0}20%{opacity:1}80%{opacity:1}100%{left:100%;opacity:0}}
+
+/* ══ SIDEBAR ══ */
+.sidebar{
+  width:var(--sidebar);min-height:100vh;
+  background:var(--bg2);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:fixed;left:0;top:0;z-index:50;
+}
+
+/* Sidebar top accent line */
+.sidebar::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2),transparent);opacity:.7}
+
+.logo-wrap{padding:1.5rem 1.2rem 1.1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.logo-icon{
+  width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(145deg,#1e1b3a,#0e0c22);
+  border:1px solid rgba(124,109,240,.35);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  box-shadow:0 0 16px rgba(124,109,240,.25);
+}
+.logo-name{font-family:var(--font-head);font-size:15px;font-weight:700;letter-spacing:-.03em;color:#fff;font-style:italic}
+.logo-sub{font-family:var(--font-mono);font-size:8px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin-top:2px}
+
+.nav{flex:1;padding:.9rem .75rem;display:flex;flex-direction:column;gap:2px}
+.nav-section{font-family:var(--font-mono);font-size:8.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);padding:.5rem .85rem .3rem;margin-top:.5rem}
+.nav-btn{
+  display:flex;align-items:center;gap:10px;padding:.58rem .85rem;
+  border-radius:9px;font-size:12.5px;color:var(--text2);
+  cursor:pointer;border:none;background:transparent;width:100%;text-align:left;
+  transition:all .15s;font-family:var(--font-body);position:relative;
+}
+.nav-btn:hover{background:rgba(255,255,255,.035);color:var(--text)}
+.nav-btn.active{background:var(--accent3);color:var(--accent2);border:1px solid var(--border-accent)}
+.nav-icon{width:16px;height:16px;flex-shrink:0;opacity:.65}
+.nav-btn.active .nav-icon{opacity:1}
+.nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-family:var(--font-mono);font-size:9px;font-weight:600;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center;box-shadow:0 0 8px rgba(124,109,240,.4)}
+.sidebar-bottom{padding:1.1rem 1.2rem;border-top:1px solid var(--border)}
+.agent-pill{display:flex;align-items:center;gap:7px;background:rgba(0,229,160,.05);border:1px solid rgba(0,229,160,.16);border-radius:20px;padding:.45rem .85rem;margin-bottom:.55rem}
+.pulse-dot{width:6px;height:6px;border-radius:50%;background:var(--fast);box-shadow:0 0 8px var(--fast);animation:pulse 2s ease-in-out infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.agent-label{font-family:var(--font-mono);font-size:9.5px;color:var(--fast);letter-spacing:.05em}
+.model-line{font-family:var(--font-mono);font-size:8.5px;color:var(--text3);letter-spacing:.07em;padding-left:2px}
+.api-mini{display:flex;flex-direction:column;gap:5px;margin-top:10px}
+.api-mini label{font-family:var(--font-mono);font-size:8.5px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:5px}
+.api-dot{width:6px;height:6px;border-radius:50%;background:#252535;transition:all .3s;flex-shrink:0}
+.api-dot.ready{background:var(--fast);box-shadow:0 0 7px rgba(0,229,160,.5)}
+.api-mini input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:6px 9px;color:var(--text);font-family:var(--font-mono);font-size:10px;outline:none;transition:border-color .2s}
+.api-mini input:focus{border-color:var(--accent)}
+.api-mini input::placeholder{color:var(--text3)}
+
+/* ══ MAIN ══ */
+.main{margin-left:var(--sidebar);flex:1;position:relative;z-index:1}
+.page{display:none;animation:fadeUp .3s ease both}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ══ PAGE HEADER ══ */
+.phead{padding:2rem 2.5rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
+.phead-title{font-family:var(--font-head);font-size:27px;font-weight:700;letter-spacing:-.04em;color:#fff;font-style:italic}
+.phead-sub{font-size:12.5px;color:var(--text2);margin-top:4px;line-height:1.6}
+.phead-acts{display:flex;gap:8px;align-items:center;flex-shrink:0}
+
+/* ══ BUTTONS ══ */
+.btn{display:inline-flex;align-items:center;gap:7px;border-radius:9px;padding:.52rem 1.05rem;font-family:var(--font-body);font-size:12.5px;font-weight:500;cursor:pointer;border:none;transition:all .15s}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#5542e0);color:#fff;box-shadow:0 0 20px rgba(124,109,240,.28),inset 0 1px 0 rgba(255,255,255,.1)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 0 30px rgba(124,109,240,.4),inset 0 1px 0 rgba(255,255,255,.12)}
+.btn-primary:active{transform:scale(.98)}
+.btn-primary:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.btn-ghost:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.btn-danger{background:transparent;color:var(--red);border:1px solid rgba(255,61,90,.3)}
+.btn-danger:hover{background:rgba(255,61,90,.08)}
+.btn-icon{background:transparent;color:var(--text2);border:1px solid var(--border);width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:7px;cursor:pointer;transition:all .15s;flex-shrink:0}
+.btn-icon:hover{color:var(--text);border-color:var(--border2)}
+
+/* ══ PANEL ══ */
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:.7rem 1rem;border-bottom:1px solid var(--border)}
+.panel-label{font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);display:flex;align-items:center;gap:7px}
+.panel-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 5px var(--accent)}
+
+/* ══ PROCESS PAGE ══ */
+.process-body{padding:1.75rem 2.5rem;display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;align-items:start}
+
+/* Input tabs */
+.input-tabs{display:flex;border-bottom:1px solid var(--border)}
+.input-tab{flex:1;padding:.6rem .8rem;background:transparent;border:none;color:var(--text2);font-size:11.5px;font-family:var(--font-body);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;border-bottom:2px solid transparent;margin-bottom:-1px}
+.input-tab:hover{color:var(--text)}
+.input-tab.active{color:var(--accent2);border-bottom-color:var(--accent)}
+.tab-pane{display:none;flex-direction:column;flex:1}
+.tab-pane.active{display:flex}
+
+/* Upload zone */
+.upload-zone{flex:1;min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.9rem;cursor:pointer;border:2px dashed var(--border);border-radius:0;transition:all .2s;position:relative;overflow:hidden;padding:2rem}
+.upload-zone:hover,.upload-zone.drag-over{border-color:rgba(124,109,240,.4);background:var(--accent3)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{width:52px;height:52px;border-radius:13px;background:var(--accent3);border:1px solid var(--border-accent);display:flex;align-items:center;justify-content:center}
+.upload-title{font-family:var(--font-head);font-size:15px;font-weight:700;color:var(--text);text-align:center;font-style:italic}
+.upload-sub{font-size:12px;color:var(--text2);text-align:center;line-height:1.6}
+.upload-types{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.type-tag{font-family:var(--font-mono);font-size:9px;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text3)}
+.file-preview{padding:.75rem 1rem;background:var(--bg3);border-top:1px solid var(--border);display:none;align-items:center;gap:.75rem}
+.file-preview.visible{display:flex}
+.file-icon{width:32px;height:32px;border-radius:7px;background:var(--accent3);border:1px solid var(--border-accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.file-name{font-family:var(--font-mono);font-size:10.5px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-size{font-family:var(--font-mono);font-size:9px;color:var(--text3)}
+
+/* Textarea */
+.fnol-ta{flex:1;width:100%;min-height:310px;background:transparent;border:none;outline:none;resize:vertical;font-family:var(--font-mono);font-size:11.5px;line-height:1.85;color:#a0b0cc;padding:.9rem 1rem}
+.fnol-ta::placeholder{color:var(--text3)}
+.sample-strip{padding:.55rem .9rem;border-top:1px solid var(--border);display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:rgba(0,0,0,.15)}
+.strip-label{font-family:var(--font-mono);font-size:9.5px;color:var(--text3);letter-spacing:.06em;flex-shrink:0}
+.sample-chip{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text2);border-radius:20px;padding:3px 9px;font-size:10.5px;cursor:pointer;transition:all .15s;font-family:var(--font-body);white-space:nowrap}
+.sample-chip:hover{background:var(--accent3);border-color:var(--border-accent);color:var(--accent2)}
+
+/* ══ OUTPUT ══ */
+.out-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:360px;gap:.9rem;color:var(--text3);text-align:center;padding:2rem}
+.out-empty p{font-size:12.5px;line-height:1.6}
+.out-empty strong{color:var(--text2)}
+
+/* ══ LOADING STATE — premium redesign ══ */
+.loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:360px;gap:2rem;padding:2rem}
+
+/* Neural network animation */
+.neural-canvas{position:relative;width:120px;height:120px}
+.neural-ring{position:absolute;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%)}
+.nr-outer{width:110px;height:110px;border:1.5px solid rgba(124,109,240,.15)}
+.nr-mid{width:78px;height:78px;border:1.5px solid rgba(124,109,240,.25);animation:rotateMid 6s linear infinite}
+.nr-inner{width:50px;height:50px;border:1.5px solid rgba(124,109,240,.4);animation:rotateInner 3s linear infinite reverse}
+@keyframes rotateMid{to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes rotateInner{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.nr-core{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:28px;height:28px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,109,240,.9) 0%,rgba(84,69,200,.6) 50%,transparent 100%);
+  box-shadow:0 0 20px rgba(124,109,240,.6),0 0 40px rgba(124,109,240,.2);
+  animation:corePulse 1.6s ease-in-out infinite alternate;
+}
+@keyframes corePulse{from{transform:translate(-50%,-50%) scale(.85);box-shadow:0 0 12px rgba(124,109,240,.4)}to{transform:translate(-50%,-50%) scale(1.1);box-shadow:0 0 28px rgba(124,109,240,.8),0 0 50px rgba(124,109,240,.25)}}
+
+/* Orbiting dots */
+.orbit-dot{position:absolute;top:50%;left:50%;width:6px;height:6px;border-radius:50%;margin:-3px;animation:orbit linear infinite}
+.od-1{background:var(--accent2);animation-duration:2s;--orbit-r:55px}
+.od-2{background:var(--fast);animation-duration:3.1s;animation-delay:-.5s;--orbit-r:39px}
+.od-3{background:var(--blue);animation-duration:1.7s;animation-delay:-1s;--orbit-r:55px}
+@keyframes orbit{from{transform:rotate(0deg) translateX(var(--orbit-r))}to{transform:rotate(360deg) translateX(var(--orbit-r))}}
+
+/* Dots on outer ring */
+.ring-tick{position:absolute;top:50%;left:50%;width:4px;height:4px;border-radius:50%;margin:-2px;background:rgba(124,109,240,.5)}
+.rt-1{transform:rotate(0deg) translateX(55px);animation:tickBlink 1.5s ease-in-out infinite}
+.rt-2{transform:rotate(72deg) translateX(55px);animation:tickBlink 1.5s ease-in-out infinite .3s}
+.rt-3{transform:rotate(144deg) translateX(55px);animation:tickBlink 1.5s ease-in-out infinite .6s}
+.rt-4{transform:rotate(216deg) translateX(55px);animation:tickBlink 1.5s ease-in-out infinite .9s}
+.rt-5{transform:rotate(288deg) translateX(55px);animation:tickBlink 1.5s ease-in-out infinite 1.2s}
+@keyframes tickBlink{0%,100%{opacity:.2;transform:rotate(var(--rd,0deg)) translateX(55px) scale(1)}50%{opacity:1;transform:rotate(var(--rd,0deg)) translateX(55px) scale(1.8)}}
+
+.load-status{display:flex;flex-direction:column;align-items:center;gap:.4rem;text-align:center}
+.load-status-main{font-family:var(--font-mono);font-size:11px;color:var(--accent2);letter-spacing:.08em;animation:blink 1.3s ease-in-out infinite alternate}
+@keyframes blink{from{opacity:.4}to{opacity:1}}
+.load-status-sub{font-family:var(--font-mono);font-size:9.5px;color:var(--text3);letter-spacing:.06em}
+
+/* Step tracker */
+.load-steps{display:flex;flex-direction:column;gap:6px;width:220px}
+.load-step-item{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:9.5px;color:var(--text3);transition:all .3s}
+.load-step-item.active{color:var(--accent2)}
+.load-step-item.done{color:var(--fast)}
+.step-indicator{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--text3);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s}
+.load-step-item.active .step-indicator{border-color:var(--accent);background:var(--accent3);animation:stepPulse 1s ease-in-out infinite alternate}
+.load-step-item.done .step-indicator{border-color:var(--fast);background:rgba(0,229,160,.1)}
+@keyframes stepPulse{from{box-shadow:0 0 0 0 rgba(124,109,240,.4)}to{box-shadow:0 0 0 4px rgba(124,109,240,.1)}}
+.step-dot{width:4px;height:4px;border-radius:50%;background:var(--text3);transition:background .3s}
+.load-step-item.active .step-dot{background:var(--accent)}
+.load-step-item.done .step-dot{background:var(--fast)}
+
+/* ══ RESULT ══ */
+.result-wrap{padding:.9rem;display:flex;flex-direction:column;gap:.8rem}
+.route-card{border-radius:11px;border:1px solid;padding:1.1rem;display:flex;align-items:center;gap:.9rem;position:relative;overflow:hidden}
+.route-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:currentColor;opacity:.5}
+.route-card.fast{background:var(--fast-dim);border-color:rgba(0,229,160,.2);color:var(--fast)}
+.route-card.fraud{background:var(--red-dim);border-color:rgba(255,61,90,.2);color:var(--red)}
+.route-card.injury{background:var(--blue-dim);border-color:rgba(34,211,238,.2);color:var(--blue)}
+.route-card.manual{background:var(--amber-dim);border-color:rgba(245,158,11,.2);color:var(--amber)}
+.route-icon-wrap{width:46px;height:46px;border-radius:12px;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:.7}
+.route-meta{flex:1;min-width:0}
+.route-eyebrow{font-family:var(--font-mono);font-size:8.5px;text-transform:uppercase;letter-spacing:.14em;opacity:.5;margin-bottom:3px}
+.route-name{font-family:var(--font-head);font-size:19px;font-weight:700;letter-spacing:-.03em;line-height:1;font-style:italic}
+.conf-wrap{margin-top:8px}
+.conf-label{font-family:var(--font-mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;display:flex;justify-content:space-between;margin-bottom:4px}
+.conf-track{height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
+.conf-fill{height:100%;border-radius:2px;transition:width .9s cubic-bezier(.4,0,.2,1);background:var(--accent2)}
+.conf-fill.mid{background:var(--amber)}
+.conf-fill.low{background:var(--red)}
+.route-bars{display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0}
+.bar-row{display:flex;gap:3px}
+.bar-seg{width:5px;height:14px;border-radius:2px;background:currentColor;opacity:.1;transition:opacity .4s}
+.bar-seg.lit{opacity:1}
+.reason-box{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:.85rem 1rem}
+.box-eyebrow{font-family:var(--font-mono);font-size:8.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.reason-text{font-size:12.5px;color:var(--text2);line-height:1.75}
+.missing-box{background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.2);border-radius:9px;padding:.85rem 1rem}
+.missing-box .box-eyebrow{color:var(--amber)}
+.miss-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.miss-chip{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:var(--amber);border-radius:4px;padding:2px 9px;font-family:var(--font-mono);font-size:10px}
+
+/* Fields grid */
+.fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.field-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 8px;border-radius:5px;gap:8px}
+.field-row:hover{background:rgba(255,255,255,.02)}
+.field-key{font-family:var(--font-mono);font-size:9.5px;color:var(--text3);white-space:nowrap;flex-shrink:0}
+.field-val{font-size:11px;color:var(--text2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px}
+.field-val.missing{color:rgba(245,158,11,.5);font-style:italic}
+.field-conf{font-family:var(--font-mono);font-size:8.5px;color:var(--text3);margin-left:3px;flex-shrink:0}
+.field-conf.hi{color:var(--fast)}
+.field-conf.mid{color:var(--amber)}
+.field-conf.lo{color:var(--red)}
+
+/* JSON accordion */
+.json-accordion{border:1px solid var(--border);border-radius:9px;overflow:hidden}
+.json-toggle{width:100%;background:var(--bg3);border:none;color:var(--text2);font-family:var(--font-body);font-size:12px;padding:.65rem 1rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:all .15s}
+.json-toggle:hover{color:var(--text)}
+.json-toggle svg{transition:transform .2s}
+.json-toggle.open svg{transform:rotate(180deg)}
+.json-body{border-top:1px solid var(--border)}
+pre.json{font-family:var(--font-mono);font-size:10.5px;line-height:1.75;color:#6ecba8;padding:.9rem;overflow-x:auto;max-height:260px;background:#020408;margin:0}
+
+/* ══ BATCH PAGE ══ */
+.batch-body{padding:1.75rem 2.5rem}
+.batch-drop{border:2px dashed var(--border);border-radius:var(--r);padding:2.5rem 2rem;text-align:center;cursor:pointer;transition:all .2s;position:relative;margin-bottom:1.5rem}
+.batch-drop:hover,.batch-drop.drag-over{border-color:rgba(124,109,240,.4);background:var(--accent3)}
+.batch-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.batch-drop-icon{display:flex;justify-content:center;margin-bottom:.75rem}
+.batch-drop-title{font-family:var(--font-head);font-size:17px;font-weight:700;color:var(--text);margin-bottom:.35rem;font-style:italic}
+.batch-drop-sub{font-size:12.5px;color:var(--text2)}
+.batch-queue{display:flex;flex-direction:column;gap:7px;margin-bottom:1.5rem}
+.batch-item{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.8rem 1.1rem;display:flex;align-items:center;gap:.9rem;animation:slideIn .3s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+.batch-item-icon{width:34px;height:34px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.batch-item-name{flex:1;font-size:12.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.batch-item-size{font-family:var(--font-mono);font-size:9.5px;color:var(--text3)}
+.batch-status{font-family:var(--font-mono);font-size:9.5px;padding:3px 8px;border-radius:4px;flex-shrink:0}
+.bs-pending{background:rgba(255,255,255,.04);color:var(--text3)}
+.bs-processing{background:var(--accent3);color:var(--accent2);animation:blink 1s infinite}
+.bs-done{background:rgba(0,229,160,.08);color:var(--fast)}
+.bs-error{background:var(--red-dim);color:var(--red)}
+.batch-item-remove{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;border-radius:4px;transition:color .15s;display:flex;align-items:center}
+.batch-item-remove:hover{color:var(--red)}
+.batch-results{display:flex;flex-direction:column;gap:8px}
+.batch-result-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.9rem 1.1rem;cursor:pointer;transition:all .15s}
+.batch-result-card:hover{border-color:var(--border2);background:var(--bg3)}
+.brc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
+.brc-filename{font-family:var(--font-mono);font-size:10.5px;color:var(--text2)}
+.brc-route{font-family:var(--font-mono);font-size:9.5px;padding:3px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em}
+.brc-fields{display:flex;gap:.9rem;flex-wrap:wrap}
+.brc-field{font-size:10.5px;color:var(--text3)}
+.brc-field strong{color:var(--text2)}
+
+/* ══ HISTORY PAGE ══ */
+.history-body{padding:1.75rem 2.5rem}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.75rem}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px}
+.stat-card.all::after{background:linear-gradient(90deg,var(--accent),transparent)}
+.stat-card.fast-s::after{background:linear-gradient(90deg,var(--fast),transparent)}
+.stat-card.flag-s::after{background:linear-gradient(90deg,var(--red),transparent)}
+.stat-card.review-s::after{background:linear-gradient(90deg,var(--amber),transparent)}
+.stat-label{font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:6px}
+.stat-val{font-family:var(--font-head);font-size:28px;font-weight:700;letter-spacing:-.04em;font-style:italic}
+.history-list-wrap{display:flex;flex-direction:column;gap:7px}
+.hist-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.85rem 1.1rem;display:flex;align-items:center;gap:.9rem;cursor:pointer;transition:all .15s}
+.hist-card:hover{border-color:var(--border2);background:var(--bg3);transform:translateX(3px)}
+.hist-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;box-shadow:0 0 8px currentColor}
+.hist-info{flex:1;min-width:0}
+.hist-policy{font-size:12.5px;font-weight:500;color:var(--text)}
+.hist-holder{font-size:11px;color:var(--text2);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist-badge{font-family:var(--font-mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;padding:3px 8px;border-radius:4px;flex-shrink:0}
+.hist-time{font-family:var(--font-mono);font-size:9.5px;color:var(--text3);flex-shrink:0}
+.hist-conf{font-family:var(--font-mono);font-size:9.5px;color:var(--text3);flex-shrink:0}
+.empty-hist{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 2rem;gap:.9rem;color:var(--text3);text-align:center;border:1px dashed var(--border);border-radius:var(--r)}
+.empty-hist p{font-size:12.5px}
+
+/* ══ ANALYTICS PAGE ══ */
+.analytics-body{padding:1.75rem 2.5rem}
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem}
+.chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;overflow:hidden}
+.chart-title{font-family:var(--font-head);font-size:14.5px;font-weight:700;color:var(--text);margin-bottom:.2rem;font-style:italic}
+.chart-sub{font-size:11.5px;color:var(--text2);margin-bottom:1.25rem}
+.donut-wrap{display:flex;align-items:center;gap:2rem}
+.donut-legend{display:flex;flex-direction:column;gap:.55rem;flex:1}
+.legend-row{display:flex;align-items:center;gap:8px;font-size:12px}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.legend-label{color:var(--text2);flex:1}
+.legend-val{font-family:var(--font-mono);font-size:10.5px;color:var(--text);font-weight:500}
+.bar-chart{display:flex;flex-direction:column;gap:9px}
+.bchart-row{display:flex;align-items:center;gap:9px}
+.bchart-label{font-size:10.5px;color:var(--text2);width:80px;flex-shrink:0;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bchart-track{flex:1;height:18px;background:rgba(255,255,255,.04);border-radius:4px;overflow:hidden}
+.bchart-fill{height:100%;border-radius:4px;transition:width 1s ease;display:flex;align-items:center;padding:0 7px}
+.bchart-val{font-family:var(--font-mono);font-size:9.5px;color:rgba(0,0,0,.7);font-weight:600;white-space:nowrap}
+.damage-chart{height:110px;position:relative;display:flex;align-items:flex-end;gap:4px;padding-bottom:22px}
+.damage-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%}
+.damage-bar{width:100%;border-radius:3px 3px 0 0;transition:height .8s ease;background:var(--accent);opacity:.7;margin-top:auto}
+.damage-label{font-family:var(--font-mono);font-size:8.5px;color:var(--text3);white-space:nowrap;transform:rotate(-35deg);transform-origin:center top;width:38px;text-align:center}
+.analytics-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:130px;color:var(--text3);font-size:12.5px;gap:.5rem;text-align:center}
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem}
+.kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.9rem 1.1rem}
+.kpi-label{font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:5px}
+.kpi-val{font-family:var(--font-head);font-size:24px;font-weight:700;letter-spacing:-.04em;color:var(--text);font-style:italic}
+.kpi-sub{font-size:10.5px;color:var(--text2);margin-top:3px}
+
+/* ══ RULES PAGE ══ */
+.rules-body{padding:1.75rem 2.5rem}
+.rules-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:2.5rem}
+.rule-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.4rem;position:relative;overflow:hidden;transition:border-color .2s,transform .2s}
+.rule-card:hover{transform:translateY(-2px);border-color:var(--border2)}
+.rule-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.r-fraud::before{background:var(--red);box-shadow:0 0 12px var(--red)}
+.r-injury::before{background:var(--blue);box-shadow:0 0 12px var(--blue)}
+.r-manual::before{background:var(--amber);box-shadow:0 0 12px var(--amber)}
+.r-fast::before{background:var(--accent);box-shadow:0 0 12px var(--accent)}
+.rule-num{font-family:var(--font-mono);font-size:9.5px;color:var(--text3);letter-spacing:.12em;margin-bottom:.6rem}
+.rule-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.07em;padding:4px 10px;border-radius:5px;margin-bottom:.75rem}
+.rb-fraud{background:rgba(255,61,90,.12);color:var(--red);border:1px solid rgba(255,61,90,.2)}
+.rb-injury{background:rgba(34,211,238,.12);color:var(--blue);border:1px solid rgba(34,211,238,.2)}
+.rb-manual{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.2)}
+.rb-fast{background:rgba(0,229,160,.08);color:var(--fast);border:1px solid rgba(0,229,160,.2)}
+.rule-card h3{font-family:var(--font-head);font-size:16px;font-weight:700;letter-spacing:-.03em;margin-bottom:.55rem;color:#fff;font-style:italic}
+.rule-card p{font-size:12.5px;color:var(--text2);line-height:1.75;margin-bottom:.9rem}
+.rule-card code{font-family:var(--font-mono);font-size:10.5px;background:rgba(255,255,255,.06);padding:2px 5px;border-radius:3px;color:var(--text)}
+.trigger-line{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:.5rem .8rem;font-family:var(--font-mono);font-size:10.5px;color:var(--accent2)}
+.trigger-lbl{color:var(--text3);flex-shrink:0}
+.fields-section h2{font-family:var(--font-head);font-size:18px;font-weight:700;letter-spacing:-.03em;margin-bottom:1.1rem;color:#fff;font-style:italic}
+.fgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.fgroup{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.9rem 1rem}
+.fgroup-title{font-family:var(--font-mono);font-size:8.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent2);margin-bottom:.55rem}
+.fgroup ul{list-style:none}
+.fgroup li{font-size:11.5px;color:var(--text2);padding:3.5px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.fgroup li:last-child{border-bottom:none}
+.fgroup li::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--text3);flex-shrink:0}
+
+/* ══ TOAST ══ */
+.toast{position:fixed;bottom:1.75rem;right:1.75rem;background:var(--bg2);border:1px solid var(--border-accent);border-radius:10px;padding:.75rem 1.1rem;font-size:12.5px;color:var(--accent2);font-family:var(--font-mono);z-index:9000;animation:toastIn .3s ease;display:flex;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,.6),0 0 0 1px rgba(124,109,240,.1)}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ══ LIGHT THEME ══ */
+body.light{
+  --bg:#f4f3ff;--bg2:#ffffff;--bg3:#eeedf8;--bg4:#e6e4f5;
+  --accent:#6152d8;--accent2:#4c3fc7;--accent3:rgba(97,82,216,0.10);
+  --accent-glow:rgba(97,82,216,0.25);
+  --fast:#00a372;--fast-dim:rgba(0,163,114,0.10);
+  --red:#d9243e;--red-dim:rgba(217,36,62,0.08);
+  --blue:#0e9bb5;--blue-dim:rgba(14,155,181,0.08);
+  --amber:#c97d00;--amber-dim:rgba(201,125,0,0.08);
+  --text:#1a1635;--text2:#5a5480;--text3:#b0aad0;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --border-accent:rgba(97,82,216,0.22);
+}
+body.light::after{background-image:linear-gradient(rgba(97,82,216,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(97,82,216,.025) 1px,transparent 1px)}
+body.light .sidebar{box-shadow:2px 0 16px rgba(0,0,0,.08)}
+body.light .fnol-ta{color:#2a244a}
+body.light .boot-console,.light .console-body{background:#fff}
+body.light #splash{background:#f4f3ff}
+
+/* Theme toggle btn */
+.theme-toggle{background:none;border:1px solid var(--border2);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);transition:all .2s;flex-shrink:0}
+.theme-toggle:hover{color:var(--text);border-color:var(--accent);background:var(--accent3)}
+
+/* ══ FRAUD RISK METER ══ */
+.fraud-meter-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.9rem 1rem;display:flex;flex-direction:column;gap:.65rem}
+.fraud-meter-header{display:flex;align-items:center;justify-content:space-between}
+.fraud-meter-label{font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);display:flex;align-items:center;gap:6px}
+.fraud-score-num{font-family:var(--font-head);font-size:20px;font-weight:700;font-style:italic}
+.fraud-track{height:8px;background:rgba(255,255,255,.06);border-radius:6px;overflow:hidden;position:relative}
+body.light .fraud-track{background:rgba(0,0,0,.07)}
+.fraud-fill{height:100%;border-radius:6px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.fraud-low .fraud-fill{background:linear-gradient(90deg,var(--fast),#66ffcc)}
+.fraud-mid .fraud-fill{background:linear-gradient(90deg,var(--amber),#ffcc44)}
+.fraud-high .fraud-fill{background:linear-gradient(90deg,var(--red),#ff8888)}
+.fraud-ticks{display:flex;justify-content:space-between;margin-top:3px}
+.fraud-tick{font-family:var(--font-mono);font-size:8px;color:var(--text3)}
+.fraud-verdict{font-size:11.5px;color:var(--text2);display:flex;align-items:center;gap:6px;font-weight:500}
+.fraud-verdict .fv-badge{font-family:var(--font-mono);font-size:9px;padding:2px 8px;border-radius:4px;font-weight:600}
+
+/* ══ INLINE EDIT ══ */
+.field-row{position:relative}
+.field-val.editable{cursor:pointer;border-radius:4px;padding:1px 4px;margin:-1px -4px;transition:background .15s}
+.field-val.editable:hover{background:var(--accent3);outline:1px dashed var(--border-accent)}
+.field-edit-input{background:var(--bg3);border:1px solid var(--accent);border-radius:5px;color:var(--text);font-family:var(--font-mono);font-size:11px;padding:2px 6px;width:100%;outline:none;box-shadow:0 0 0 3px rgba(124,109,240,.12)}
+.edit-hint{font-family:var(--font-mono);font-size:8.5px;color:var(--text3);padding:.3rem .5rem;display:flex;gap:8px}
+.edit-hint kbd{background:var(--bg4);border:1px solid var(--border2);border-radius:3px;padding:1px 4px;font-size:8px}
+
+/* ══ COMPARE MODAL ══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:8000;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s ease;backdrop-filter:blur(6px)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-box{background:var(--bg2);border:1px solid var(--border-accent);border-radius:16px;width:min(900px,92vw);max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.5)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.4rem;border-bottom:1px solid var(--border);flex-shrink:0}
+.modal-title{font-family:var(--font-head);font-size:18px;font-weight:700;letter-spacing:-.03em;font-style:italic}
+.modal-body{overflow-y:auto;padding:1.25rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.cmp-col{display:flex;flex-direction:column;gap:.65rem}
+.cmp-col-head{font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+.cmp-field{display:flex;flex-direction:column;gap:2px;padding:.45rem .6rem;border-radius:7px;background:var(--bg3)}
+.cmp-field.diff{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2)}
+.cmp-key{font-family:var(--font-mono);font-size:8px;text-transform:uppercase;letter-spacing:.09em;color:var(--text3)}
+.cmp-val{font-size:11.5px;color:var(--text)}
+.cmp-diff-badge{font-family:var(--font-mono);font-size:8px;color:var(--amber);margin-left:4px}
+.hist-compare-check{width:16px;height:16px;border:1.5px solid var(--border2);border-radius:4px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.hist-compare-check.checked{background:var(--accent);border-color:var(--accent)}
+
+/* ══ KEYBOARD SHORTCUTS ══ */
+.kbd-hint{position:fixed;bottom:1.75rem;left:calc(var(--sidebar) + 1.5rem);font-family:var(--font-mono);font-size:9px;color:var(--text3);display:flex;gap:12px;z-index:10;pointer-events:none;opacity:.6}
+.kbd-hint kbd{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:1px 5px;color:var(--text2)}
+
+/* ══ PRINT STYLES ══ */
+@media print{
+  body{background:#fff!important;color:#000!important;min-height:0}
+  .sidebar,.phead-acts,.json-accordion,.out-acts,#splash,.kbd-hint,.toast,.modal-overlay,
+  #st-empty,#st-load,.miss-chips+*,.sample-strip,.input-tabs,#pane-upload{display:none!important}
+  .main{margin-left:0!important}
+  .page{display:block!important}
+  .page:not(#page-process){display:none!important}
+  .process-body{grid-template-columns:1fr!important;display:block}
+  .panel{border:1px solid #ccc!important}
+  .route-card{border:2px solid #333!important;background:#f9f9f9!important;color:#000!important}
+  .route-name{color:#000!important}
+  .field-val{color:#000!important}
+  .field-key{color:#555!important}
+  .reason-box,.missing-box{border:1px solid #ccc;border-radius:8px;padding:.75rem}
+  h1,h2{color:#000}
+  .phead{border-bottom:2px solid #000;padding:0 0 .75rem}
+  .phead-title{color:#000!important;font-size:20px}
+  .print-header{display:block!important}
+}
+.print-header{display:none;font-size:10px;color:#666;margin-bottom:.5rem;font-family:monospace}
+
+/* ══ PERSISTENT HISTORY BANNER ══ */
+.storage-banner{display:flex;align-items:center;gap:.6rem;background:var(--fast-dim);border:1px solid rgba(0,229,160,.18);border-radius:8px;padding:.5rem .85rem;font-size:11.5px;color:var(--fast);font-family:var(--font-mono);margin-bottom:1rem}
+
+/* ══ SETTINGS PAGE ══ */
+.provider-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.provider-card{
+  display:flex;align-items:center;gap:.85rem;
+  padding:.85rem 1rem;border-radius:10px;
+  background:var(--bg3);border:1px solid var(--border);
+  cursor:pointer;transition:all .15s;position:relative;
+}
+.provider-card:hover{border-color:var(--border2);background:var(--bg4)}
+.provider-card.active{border-color:var(--accent);background:var(--accent3);box-shadow:0 0 0 1px var(--border-accent)}
+.provider-logo{
+  width:38px;height:38px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-weight:700;font-size:13px;
+}
+.anthropic-logo{background:rgba(184,172,255,.12);color:var(--accent2)}
+.openai-logo{background:rgba(16,163,127,.12);color:#10a37f}
+.groq-logo{background:rgba(249,115,22,.12);color:#f97316}
+.gemini-logo{background:rgba(66,133,244,.12);color:#4285f4}
+.provider-info{flex:1;min-width:0}
+.provider-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
+.provider-model{font-family:var(--font-mono);font-size:9px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.provider-check{
+  font-size:11px;font-weight:700;
+  color:var(--accent2);
+  font-family:var(--font-mono);
+}
+.provider-ref-row{
+  display:flex;align-items:center;gap:.85rem;
+  padding:.55rem .75rem;border-radius:8px;
+  background:var(--bg3);border:1px solid var(--border);
+  font-size:11.5px;
+}
+.ref-name{font-weight:600;color:var(--text);font-size:12px;flex-shrink:0;width:72px}
+.ref-detail{flex:1;color:var(--text2);font-family:var(--font-mono);font-size:9.5px}
+.ref-prefix{font-family:var(--font-mono);font-size:10px;flex-shrink:0}
+
+/* ══ SCROLLBAR ══ */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.07);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.14)}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:1000px){.process-body,.rules-grid,.fgrid,.analytics-grid,.kpi-row{grid-template-columns:1fr}.stat-row{grid-template-columns:1fr 1fr}}
+@media(max-width:720px){:root{--sidebar:0px}.sidebar{display:none}.main{margin-left:0}.phead{flex-direction:column}.stat-row{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<!-- ══ SPLASH ══ -->
+<div id="splash">
+  <div id="splash-mesh">
+    <div class="mesh-orb"></div>
+    <div class="mesh-orb"></div>
+    <div class="mesh-orb"></div>
+  </div>
+  <div class="scanline"></div>
+  
+  <div class="splash-inner">
+    <!-- Logo -->
+    <div class="splash-logo-wrap">
+      <div class="orb-ring"></div>
+      <div class="orb-ring"></div>
+      <div class="orb-ring"></div>
+      <div class="spin-arc"></div>
+      <div class="spin-arc-2"></div>
+      <div class="ring-tick rt-1"></div>
+      <div class="ring-tick rt-2"></div>
+      <div class="ring-tick rt-3"></div>
+      <div class="ring-tick rt-4"></div>
+      <div class="ring-tick rt-5"></div>
+      <div class="logo-glow"></div>
+      <div class="splash-logo-box">
+        <!-- Realistic shield/claim icon -->
+        <svg class="logo-shield" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19 3L5 9v10c0 8.28 5.92 16.02 14 18 8.08-1.98 14-9.72 14-18V9L19 3z" fill="url(#shieldGrad)" opacity=".9"/>
+          <path d="M19 3L5 9v10c0 8.28 5.92 16.02 14 18 8.08-1.98 14-9.72 14-18V9L19 3z" stroke="rgba(255,255,255,0.25)" stroke-width="1" fill="none"/>
+          <path d="M13 19l4 4 8-8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs>
+            <linearGradient id="shieldGrad" x1="5" y1="3" x2="33" y2="37" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#9d8fff"/>
+              <stop offset="1" stop-color="#5542e0"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Title -->
+    <div class="splash-title-wrap">
+      <div class="splash-wordmark">Claim<em>Sense</em></div>
+      <div class="splash-version">Autonomous FNOL Intelligence · v3.0</div>
+    </div>
+
+    <!-- Boot console -->
+    <div class="boot-console">
+      <div class="console-titlebar">
+        <div class="win-btn"></div>
+        <div class="win-btn"></div>
+        <div class="win-btn"></div>
+        <span class="console-label">system/boot.log</span>
+      </div>
+      <div class="console-body">
+        <div class="boot-line" id="bl0"><div class="boot-loader"></div><span>Loading FNOL extraction engine...</span></div>
+        <div class="boot-line" id="bl1"><span class="boot-ok">✔</span><span>Routing engine ready — 4 rule tiers active</span></div>
+        <div class="boot-line" id="bl2"><span class="boot-ok">✔</span><span>Confidence scoring module enabled</span></div>
+        <div class="boot-line" id="bl3"><span class="boot-ok">✔</span><span>Batch processor online — parallel mode</span></div>
+        <div class="boot-line" id="bl4"><span class="boot-ok">✔</span><span>Analytics dashboard loaded — ready</span></div>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="splash-progress-wrap">
+      <div class="progress-header">
+        <span class="progress-label-txt" id="progress-label">Initializing</span>
+        <span class="progress-pct" id="splash-pct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="splash-bar"></div>
+        <div class="progress-sheen" id="progress-sheen"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="logo-wrap">
+    <div class="logo-icon">
+      <svg width="18" height="18" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19 2L4 8.5v10.5c0 8.5 6.1 16.5 15 18.5 8.9-2 15-10 15-18.5V8.5L19 2z" fill="url(#sideShield)" opacity=".9"/>
+        <path d="M12.5 19.5l4 4 9-9" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <defs>
+          <linearGradient id="sideShield" x1="4" y1="2" x2="34" y2="38" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#b8acff"/>
+            <stop offset="1" stop-color="#7c6df0"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <div style="flex:1">
+      <div class="logo-name">ClaimSense</div>
+      <div class="logo-sub">FNOL Intelligence</div>
+    </div>
+    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark">
+      <svg id="theme-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Processing</div>
+    <button class="nav-btn active" onclick="go('process')" data-p="process">
+      <!-- Document scan icon -->
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14,2 14,8 20,8"/>
+        <path d="M9 13h6M9 17h4"/>
+        <circle cx="17" cy="17" r="3"/>
+        <path d="m21 21-1.5-1.5"/>
+      </svg>
+      Process FNOL
+    </button>
+    <button class="nav-btn" onclick="go('batch')" data-p="batch">
+      <!-- Stack layers icon -->
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12,2 22,8.5 12,15 2,8.5"/>
+        <polyline points="2,15 12,21.5 22,15"/>
+        <polyline points="2,11.5 12,18 22,11.5"/>
+      </svg>
+      Batch Process
+      <span class="nav-badge" id="batch-badge" style="display:none">0</span>
+    </button>
+    <div class="nav-section">Insights</div>
+    <button class="nav-btn" onclick="go('analytics')" data-p="analytics">
+      <!-- Chart icon -->
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="14" rx="2"/>
+        <path d="M7 17v4M12 17v4M17 17v4"/>
+        <path d="M7 10l3-3 3 3 4-4"/>
+      </svg>
+      Analytics
+    </button>
+    <button class="nav-btn" onclick="go('history')" data-p="history">
+      <!-- Clock history icon -->
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 3v5h5"/>
+        <path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/>
+        <polyline points="12,7 12,12 15,15"/>
+      </svg>
+      Claims History
+      <span class="nav-badge" id="hist-badge" style="display:none">0</span>
+    </button>
+    <div class="nav-section">Reference</div>
+    <button class="nav-btn" onclick="go('rules')" data-p="rules">
+      <!-- Network/rules icon -->
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="5" r="2"/>
+        <circle cx="5" cy="19" r="2"/>
+        <circle cx="19" cy="19" r="2"/>
+        <path d="M12 7v4M12 11l-5 6M12 11l5 6"/>
+      </svg>
+      Routing Rules
+    </button>
+    <div class="nav-section">Configuration</div>
+    <button class="nav-btn" onclick="go('settings')" data-p="settings">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      API Settings
+      <span class="nav-badge" id="settings-badge" style="display:none;background:var(--fast)">✓</span>
+    </button>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="agent-pill">
+      <div class="pulse-dot" id="agent-pulse-dot"></div>
+      <span class="agent-label" id="agent-label-txt">Agent Online</span>
+    </div>
+    <div class="model-line" id="active-model-line">No provider configured</div>
+    <div class="api-mini" style="margin-top:8px">
+      <label><div class="api-dot" id="api-dot"></div> <span id="provider-label-mini">API KEY</span></label>
+      <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:3px" id="key-status-mini">Configure in API Settings →</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+
+<!-- PAGE: PROCESS -->
+<div class="page active" id="page-process">
+  <div class="phead">
+    <div>
+      <div class="phead-title">Process FNOL</div>
+      <div class="phead-sub">Paste text or upload a file — AI extracts all 16 fields, scores confidence &amp; routes the claim</div>
+    </div>
+    <div class="phead-acts">
+      <button class="btn btn-ghost" onclick="loadSample()">Load sample →</button>
+      <button class="btn btn-primary" id="run-btn" onclick="runAgent()">
+        <!-- Lightning bolt -->
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg>
+        Run Agent
+      </button>
+    </div>
+  </div>
+  <div class="process-body">
+
+    <!-- Input panel -->
+    <div class="panel">
+      <div class="panel-head" style="padding:0">
+        <div class="input-tabs" style="width:100%">
+          <button class="input-tab active" onclick="switchTab('text')" id="tab-text">
+            <!-- Text lines icon -->
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="13" y2="18"/></svg>
+            Paste Text
+          </button>
+          <button class="input-tab" onclick="switchTab('upload')" id="tab-upload">
+            <!-- Upload arrow icon -->
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Upload File
+          </button>
+        </div>
+      </div>
+
+      <!-- Text pane -->
+      <div class="tab-pane active" id="pane-text">
+        <div style="display:flex;justify-content:flex-end;padding:.45rem .7rem;border-bottom:1px solid var(--border)">
+          <button class="btn-icon" title="Clear" onclick="clearTA()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14H6L5,6"/><path d="M9,6V4h6v2"/></svg>
+          </button>
+        </div>
+        <textarea id="ta" class="fnol-ta" placeholder="Paste FNOL document text here...
+
+Expected fields:
+  Policy Number, Policyholder Name, Effective Dates
+  Incident Date, Time, Location, Description
+  Claimant, Third Parties, Contact Details
+  Asset Type, Asset ID, Estimated Damage
+  Claim Type, Attachments, Initial Estimate"></textarea>
+        <div class="sample-strip">
+          <span class="strip-label">Samples:</span>
+          <button class="sample-chip" onclick="loadIdx(0)">⚡ Fast-track</button>
+          <button class="sample-chip" onclick="loadIdx(1)">🚨 Fraud Flag</button>
+          <button class="sample-chip" onclick="loadIdx(2)">🏥 Injury</button>
+          <button class="sample-chip" onclick="loadIdx(3)">⚠️ Incomplete</button>
+          <button class="sample-chip" onclick="loadIdx(4)">🔴 High-Value</button>
+        </div>
+      </div>
+
+      <!-- Upload pane -->
+      <div class="tab-pane" id="pane-upload">
+        <div class="upload-zone" id="upload-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+          <input type="file" accept=".txt,.pdf" onchange="handleFileSelect(event)" id="file-input"/>
+          <div class="upload-icon">
+            <!-- Cloud upload icon -->
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent2)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
+              <path d="M12 12v9"/>
+              <path d="m16 16-4-4-4 4"/>
+            </svg>
+          </div>
+          <div class="upload-title">Drop FNOL file here</div>
+          <div class="upload-sub">or click to browse · text extracted automatically</div>
+          <div class="upload-types"><span class="type-tag">TXT</span><span class="type-tag">PDF</span></div>
+        </div>
+        <div class="file-preview" id="file-preview">
+          <div class="file-icon">
+            <!-- File icon -->
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14,2 14,8 20,8"/></svg>
+          </div>
+          <div style="flex:1;min-width:0"><div class="file-name" id="file-name">—</div><div class="file-size" id="file-size">—</div></div>
+          <button class="btn-icon" onclick="clearFile()">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Output panel -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-label">
+          <span class="panel-dot" style="background:var(--text3);box-shadow:none" id="out-dot"></span>
+          Agent Output
+        </span>
+        <div style="display:flex;gap:6px;opacity:0;pointer-events:none" id="out-acts">
+          <button class="btn-icon" title="Copy JSON" onclick="copyJSON()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+          <button class="btn-icon" title="Export JSON" onclick="exportSingleJSON()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+          <button class="btn-icon" title="Print claim" onclick="printClaim()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="out-empty" id="st-empty">
+        <!-- Empty state illustration -->
+        <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+          <rect x="8" y="4" width="36" height="44" rx="4" stroke="currentColor" stroke-width="1.2" opacity=".12"/>
+          <rect x="14" y="4" width="30" height="44" rx="4" stroke="currentColor" stroke-width="1.2" opacity=".08"/>
+          <path d="M16 18h20M16 24h20M16 30h14" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".12"/>
+          <circle cx="38" cy="38" r="10" fill="var(--bg3)" stroke="currentColor" stroke-width="1" opacity=".15"/>
+          <path d="M34 38h8M38 34v8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".15"/>
+        </svg>
+        <p>Paste an FNOL or upload a file,<br/>then click <strong>Run Agent</strong> to begin</p>
+      </div>
+
+      <!-- ══ ENHANCED LOADING STATE ══ -->
+      <div class="loading-wrap" id="st-load" style="display:none">
+        <div class="neural-canvas">
+          <div class="neural-ring nr-outer"></div>
+          <div class="neural-ring nr-mid"></div>
+          <div class="neural-ring nr-inner"></div>
+          <div class="orbit-dot od-1"></div>
+          <div class="orbit-dot od-2"></div>
+          <div class="orbit-dot od-3"></div>
+          <div class="nr-core"></div>
+        </div>
+        <div class="load-status">
+          <div class="load-status-main" id="load-txt">Initializing agent...</div>
+          <div class="load-status-sub" id="load-step">claude-sonnet-4-20250514</div>
+        </div>
+        <div class="load-steps" id="load-steps">
+          <div class="load-step-item" id="ls-0">
+            <div class="step-indicator"><div class="step-dot"></div></div>
+            <span>Extracting fields</span>
+          </div>
+          <div class="load-step-item" id="ls-1">
+            <div class="step-indicator"><div class="step-dot"></div></div>
+            <span>Checking mandatory fields</span>
+          </div>
+          <div class="load-step-item" id="ls-2">
+            <div class="step-indicator"><div class="step-dot"></div></div>
+            <span>Applying routing rules</span>
+          </div>
+          <div class="load-step-item" id="ls-3">
+            <div class="step-indicator"><div class="step-dot"></div></div>
+            <span>Scoring confidence</span>
+          </div>
+          <div class="load-step-item" id="ls-4">
+            <div class="step-indicator"><div class="step-dot"></div></div>
+            <span>Generating reasoning</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-wrap" id="st-result" style="display:none">
+        <div class="route-card" id="r-card">
+          <div class="route-icon-wrap" id="r-icon-wrap">
+            <!-- Icon filled by JS -->
+          </div>
+          <div class="route-meta">
+            <div class="route-eyebrow">Recommended Route</div>
+            <div class="route-name" id="r-name">—</div>
+            <div class="conf-wrap">
+              <div class="conf-label"><span>Confidence</span><span id="conf-pct">—</span></div>
+              <div class="conf-track"><div class="conf-fill" id="conf-fill" style="width:0%"></div></div>
+            </div>
+          </div>
+          <div class="route-bars" id="r-bars">
+            <div class="bar-row" id="bar-row-1"></div>
+            <div class="bar-row" id="bar-row-2"></div>
+            <div class="bar-row" id="bar-row-3"></div>
+          </div>
+        </div>
+
+        <div class="reason-box">
+          <div class="box-eyebrow">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Reasoning
+          </div>
+          <div class="reason-text" id="r-reason">—</div>
+        </div>
+
+        <div class="missing-box" id="miss-box" style="display:none">
+          <div class="box-eyebrow">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Missing / Flagged Fields
+          </div>
+          <div class="miss-chips" id="miss-chips"></div>
+        </div>
+
+        <!-- Fraud Risk Meter -->
+        <div class="fraud-meter-wrap" id="fraud-meter">
+          <div class="fraud-meter-header">
+            <span class="fraud-meter-label">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+              Fraud Risk Score
+            </span>
+            <span class="fraud-score-num" id="fraud-score-num">—</span>
+          </div>
+          <div class="fraud-track" id="fraud-track">
+            <div class="fraud-fill" id="fraud-fill" style="width:0%"></div>
+          </div>
+          <div class="fraud-ticks"><span class="fraud-tick">0 Low</span><span class="fraud-tick">50 Medium</span><span class="fraud-tick">100 High</span></div>
+          <div class="fraud-verdict" id="fraud-verdict"></div>
+        </div>
+
+        <div class="panel" style="border-radius:9px">
+          <div class="panel-head" style="padding:.55rem .8rem">
+            <span class="panel-label" style="font-size:8.5px">Extracted Fields</span>
+            <span style="font-family:var(--font-mono);font-size:8px;color:var(--text3)">click any value to edit</span>
+          </div>
+          <div class="fields-grid" style="padding:.55rem .5rem" id="fields-grid"></div>
+          <div class="edit-hint"><kbd>Enter</kbd> save &nbsp;<kbd>Esc</kbd> cancel &nbsp;— edits update confidence & JSON</div>
+        </div>
+
+        <div class="json-accordion">
+          <button class="json-toggle" id="json-tog" onclick="toggleJSON()">
+            <span>View raw JSON output</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>
+          </button>
+          <div id="json-body" style="display:none" class="json-body">
+            <pre class="json" id="json-out"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: BATCH -->
+<div class="page" id="page-batch">
+  <div class="phead">
+    <div>
+      <div class="phead-title">Batch Processing</div>
+      <div class="phead-sub">Upload multiple FNOL text files and process them sequentially</div>
+    </div>
+    <div class="phead-acts">
+      <button class="btn btn-ghost" onclick="clearBatch()">Clear queue</button>
+      <button class="btn btn-primary" id="batch-run-btn" onclick="runBatch()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg>
+        Run Batch
+      </button>
+    </div>
+  </div>
+  <div class="batch-body">
+    <div class="batch-drop" id="batch-drop" ondragover="handleBatchDragOver(event)" ondragleave="handleBatchDragLeave(event)" ondrop="handleBatchDrop(event)">
+      <input type="file" accept=".txt" multiple onchange="handleBatchSelect(event)" id="batch-file-input"/>
+      <div class="batch-drop-icon">
+        <!-- Folder upload icon -->
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent2)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity=".5">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+          <polyline points="16,13 12,9 8,13"/>
+          <line x1="12" y1="9" x2="12" y2="17"/>
+        </svg>
+      </div>
+      <div class="batch-drop-title">Drop multiple FNOL files</div>
+      <div class="batch-drop-sub">or click to browse · TXT files supported</div>
+    </div>
+    <div id="batch-queue" class="batch-queue" style="display:none"></div>
+    <div id="batch-results-section" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+        <div style="font-family:var(--font-head);font-size:15px;font-weight:700;color:var(--text);font-style:italic">Results</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" onclick="exportBatchJSON()">Export JSON</button>
+          <button class="btn btn-ghost" onclick="exportBatchCSV()">Export CSV</button>
+        </div>
+      </div>
+      <div id="batch-results" class="batch-results"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: ANALYTICS -->
+<div class="page" id="page-analytics">
+  <div class="phead">
+    <div>
+      <div class="phead-title">Analytics</div>
+      <div class="phead-sub">Aggregated insights across all claims processed this session</div>
+    </div>
+    <div class="phead-acts"><button class="btn btn-ghost" onclick="renderAnalytics()">↻ Refresh</button></div>
+  </div>
+  <div class="analytics-body">
+    <div class="kpi-row" id="kpi-row"></div>
+    <div class="analytics-grid">
+      <div class="chart-card">
+        <div class="chart-title">Route Distribution</div>
+        <div class="chart-sub">Breakdown of routing decisions</div>
+        <div id="donut-wrap"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Claims by Policyholder</div>
+        <div class="chart-sub">Top claimants by volume</div>
+        <div id="bar-chart-wrap"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Damage Estimate Distribution (₹)</div>
+        <div class="chart-sub">Bucketed by value range</div>
+        <div id="damage-chart-wrap"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Missing Field Frequency</div>
+        <div class="chart-sub">Most commonly absent fields</div>
+        <div id="missing-chart-wrap"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: HISTORY -->
+<div class="page" id="page-history">
+  <div class="phead">
+    <div>
+      <div class="phead-title">Claims History</div>
+      <div class="phead-sub">All claims processed — persisted across sessions · click any to re-view · check two to compare</div>
+    </div>
+    <div class="phead-acts">
+      <button class="btn btn-ghost" id="compare-btn" onclick="openCompare()" style="display:none">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="18"/><rect x="14" y="3" width="7" height="18"/></svg>
+        Compare (2)
+      </button>
+      <button class="btn btn-ghost" onclick="exportCSV()">Export CSV</button>
+      <button class="btn btn-ghost" onclick="exportHist()">Export JSON</button>
+      <button class="btn btn-danger" onclick="clearHist()">Clear All</button>
+    </div>
+  </div>
+  <div class="history-body">
+    <div id="storage-banner" class="storage-banner" style="display:none;margin:1.25rem 2.5rem 0">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      <span id="storage-banner-txt">History loaded from previous session</span>
+    </div>
+    <div class="stat-row" id="stat-row"></div>
+    <div class="history-list-wrap" id="hist-list"></div>
+  </div>
+</div>
+
+<!-- COMPARE MODAL -->
+<div id="compare-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeCompare()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">Claim Comparison</div>
+      <button class="btn-icon" onclick="closeCompare()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="compare-body"></div>
+  </div>
+</div>
+
+<!-- PAGE: RULES -->
+<div class="page" id="page-rules">
+  <div class="phead">
+    <div>
+      <div class="phead-title">Routing Rules</div>
+      <div class="phead-sub">How the agent classifies and routes every FNOL claim — applied in strict priority order</div>
+    </div>
+  </div>
+  <div class="rules-body">
+    <div class="rules-grid">
+      <div class="rule-card r-fraud">
+        <div class="rule-num">PRIORITY 01</div>
+        <div class="rule-badge rb-fraud">
+          <!-- Alert icon -->
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Investigation Flag
+        </div>
+        <h3>Fraud Keywords Detected</h3>
+        <p>If the incident description contains trigger words like <code>fraud</code>, <code>staged</code>, <code>inconsistent</code>, or <code>fabricated</code>, the claim is immediately flagged regardless of damage value.</p>
+        <div class="trigger-line"><span class="trigger-lbl">TRIGGER</span> description ∋ {fraud, staged, inconsistent, fabricated}</div>
+      </div>
+      <div class="rule-card r-injury">
+        <div class="rule-num">PRIORITY 02</div>
+        <div class="rule-badge rb-injury">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M3 6h18a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"/><path d="M12 14v4M10 16h4"/></svg>
+          Specialist Queue
+        </div>
+        <h3>Injury Claims</h3>
+        <p>Any claim with <code>Claim Type = Injury</code> routes to a specialist queue for medical assessment and legal review — regardless of the damage amount.</p>
+        <div class="trigger-line"><span class="trigger-lbl">TRIGGER</span> claimType === "Injury"</div>
+      </div>
+      <div class="rule-card r-manual">
+        <div class="rule-num">PRIORITY 03</div>
+        <div class="rule-badge rb-manual">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Manual Review
+        </div>
+        <h3>Missing Mandatory Fields</h3>
+        <p>If any of the 16 mandatory fields are absent or empty, the claim cannot be auto-processed and is flagged for a human reviewer.</p>
+        <div class="trigger-line"><span class="trigger-lbl">TRIGGER</span> missingFields.length &gt; 0</div>
+      </div>
+      <div class="rule-card r-fast">
+        <div class="rule-num">PRIORITY 04</div>
+        <div class="rule-badge rb-fast">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg>
+          Fast-track
+        </div>
+        <h3>Low-Value Clean Claims</h3>
+        <p>All fields present, no fraud indicators, no injury, and estimated damage below ₹25,000 — automatically fast-tracked for same-day settlement.</p>
+        <div class="trigger-line"><span class="trigger-lbl">TRIGGER</span> estimatedDamage &lt; 25000</div>
+      </div>
+    </div>
+    <div class="fields-section">
+      <h2>Mandatory Fields (16 total)</h2>
+      <div class="fgrid">
+        <div class="fgroup"><div class="fgroup-title">Policy</div><ul><li>Policy Number</li><li>Policyholder Name</li><li>Effective Dates</li></ul></div>
+        <div class="fgroup"><div class="fgroup-title">Incident</div><ul><li>Incident Date</li><li>Incident Time</li><li>Location</li><li>Description</li></ul></div>
+        <div class="fgroup"><div class="fgroup-title">Parties</div><ul><li>Claimant Name</li><li>Third Parties</li><li>Contact Details</li></ul></div>
+        <div class="fgroup"><div class="fgroup-title">Asset &amp; Financial</div><ul><li>Asset Type</li><li>Asset ID</li><li>Estimated Damage</li><li>Claim Type</li><li>Attachments</li><li>Initial Estimate</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: SETTINGS -->
+<div class="page" id="page-settings">
+  <div class="phead">
+    <div>
+      <div class="phead-title">API Settings</div>
+      <div class="phead-sub">Configure your AI provider and API key — supports Anthropic, OpenAI, Groq, and Google Gemini</div>
+    </div>
+    <div class="phead-acts">
+      <button class="btn btn-primary" onclick="saveSettings()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13"/><polyline points="7,3 7,8 15,8"/></svg>
+        Save Settings
+      </button>
+    </div>
+  </div>
+  <div style="padding:2rem 2.5rem;max-width:720px">
+
+    <!-- Provider selector -->
+    <div class="panel" style="margin-bottom:1.25rem">
+      <div class="panel-head">
+        <span class="panel-label"><span class="panel-dot"></span>AI Provider</span>
+      </div>
+      <div style="padding:1.25rem;display:flex;flex-direction:column;gap:1rem">
+        <p style="font-size:12.5px;color:var(--text2);line-height:1.6">Select your AI provider. Each provider uses a different model and endpoint. Your API key is stored only in your browser's sessionStorage and never sent anywhere except the provider's API.</p>
+        <div class="provider-grid" id="provider-grid">
+          <div class="provider-card active" data-provider="anthropic" onclick="selectProvider('anthropic')">
+            <div class="provider-logo anthropic-logo">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M13.8 2h-3.6L3 22h3.9l1.5-4.1h7.2L17.1 22H21L13.8 2zm-4.3 12.4 2.5-7 2.5 7H9.5z"/></svg>
+            </div>
+            <div class="provider-info">
+              <div class="provider-name">Anthropic</div>
+              <div class="provider-model" id="disp-anthropic">claude-sonnet-4-20250514</div>
+            </div>
+            <div class="provider-check" id="check-anthropic">✓</div>
+          </div>
+          <div class="provider-card" data-provider="openai" onclick="selectProvider('openai')">
+            <div class="provider-logo openai-logo">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M22.28 9.38a5.67 5.67 0 0 0-.49-4.66 5.74 5.74 0 0 0-6.2-2.75 5.67 5.67 0 0 0-4.27-1.9 5.74 5.74 0 0 0-5.47 3.97 5.67 5.67 0 0 0-3.79 2.75 5.74 5.74 0 0 0 .71 6.73 5.67 5.67 0 0 0 .49 4.66 5.74 5.74 0 0 0 6.2 2.75 5.67 5.67 0 0 0 4.27 1.9 5.74 5.74 0 0 0 5.47-3.98 5.67 5.67 0 0 0 3.79-2.75 5.74 5.74 0 0 0-.71-6.72zm-8.56 12a4.26 4.26 0 0 1-2.73-.99l.13-.08 4.54-2.62a.75.75 0 0 0 .38-.65v-6.4l1.92 1.11a.07.07 0 0 1 .04.05v5.3a4.28 4.28 0 0 1-4.28 4.28zM3.44 18.37a4.26 4.26 0 0 1-.51-2.87l.14.08 4.54 2.62a.75.75 0 0 0 .75 0l5.54-3.2v2.22a.07.07 0 0 1-.03.06l-4.59 2.65a4.28 4.28 0 0 1-5.84-1.56zm-1.11-9.95a4.26 4.26 0 0 1 2.24-1.87v5.37a.75.75 0 0 0 .38.65l5.54 3.2-1.92 1.1a.07.07 0 0 1-.07 0L3.9 14.2a4.28 4.28 0 0 1-1.57-5.78zm15.73 3.68L12.52 8.9l1.92-1.1a.07.07 0 0 1 .07 0l4.59 2.65a4.27 4.27 0 0 1-.66 7.71v-5.38a.75.75 0 0 0-.38-.68zm1.91-2.9l-.14-.08-4.54-2.62a.75.75 0 0 0-.75 0L8.99 9.7V7.48a.07.07 0 0 1 .03-.06l4.59-2.65a4.28 4.28 0 0 1 6.36 4.43zM7.99 12.98l-1.92-1.11a.07.07 0 0 1-.04-.05V6.52a4.28 4.28 0 0 1 7.02-3.29l-.13.08L8.38 5.93a.75.75 0 0 0-.38.65v6.4zm1.04-2.25 2.47-1.42 2.47 1.42v2.84l-2.47 1.42-2.47-1.42v-2.84z"/></svg>
+            </div>
+            <div class="provider-info">
+              <div class="provider-name">OpenAI</div>
+              <div class="provider-model" id="disp-openai">gpt-4o</div>
+            </div>
+            <div class="provider-check" id="check-openai" style="display:none">✓</div>
+          </div>
+          <div class="provider-card" data-provider="groq" onclick="selectProvider('groq')">
+            <div class="provider-logo groq-logo">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><path fill="var(--bg2)" d="M12 6a6 6 0 0 0 0 12 6 6 0 0 0 0-12zm0 2a4 4 0 0 1 4 4h-4V8zm0 8a4 4 0 0 1-4-4h4v4z"/></svg>
+            </div>
+            <div class="provider-info">
+              <div class="provider-name">Groq</div>
+              <div class="provider-model" id="disp-groq">llama-3.3-70b-versatile</div>
+            </div>
+            <div class="provider-check" id="check-groq" style="display:none">✓</div>
+          </div>
+          <div class="provider-card" data-provider="gemini" onclick="selectProvider('gemini')">
+            <div class="provider-logo gemini-logo">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-4-4 1.41-1.41L11 14.17l6.59-6.59L19 9l-8 8z" fill="none"/><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 3c.93 0 1.83.14 2.67.39L12 12 9.33 5.39A9.05 9.05 0 0 1 12 5zm-7.6 6.72L10.78 12l-6.38.96A8.97 8.97 0 0 1 4 12c0-.45.04-.89.1-1.32L4.4 11.72zM12 19c-.93 0-1.83-.14-2.67-.39L12 12l2.67 6.61A9.05 9.05 0 0 1 12 19zm7.6-6.72L13.22 12l6.38-.96c.06.43.1.87.1 1.32 0 1.62-.43 3.14-1.1 4.48v.01l.6-3.57z"/></svg>
+            </div>
+            <div class="provider-info">
+              <div class="provider-name">Google Gemini</div>
+              <div class="provider-model" id="disp-gemini">gemini-1.5-flash</div>
+            </div>
+            <div class="provider-check" id="check-gemini" style="display:none">✓</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- API Key input -->
+    <div class="panel" style="margin-bottom:1.25rem">
+      <div class="panel-head">
+        <span class="panel-label"><span class="panel-dot"></span>API Key</span>
+        <span style="font-family:var(--font-mono);font-size:8.5px;color:var(--text3)">Stored in sessionStorage only</span>
+      </div>
+      <div style="padding:1.25rem;display:flex;flex-direction:column;gap:.85rem">
+        <div style="display:flex;align-items:center;gap:.6rem;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:.6rem .9rem">
+          <div class="api-dot" id="settings-api-dot"></div>
+          <input type="password" id="settings-api-key" placeholder="Paste your API key here..."
+            style="flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:var(--font-mono);font-size:12px"
+            oninput="onSettingsKeyInput()"/>
+          <button onclick="toggleKeyVisibility()" style="background:none;border:none;cursor:pointer;color:var(--text2);padding:0;display:flex;align-items:center" title="Show/hide key">
+            <svg id="eye-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div id="key-hint" style="font-size:11.5px;color:var(--text2);font-family:var(--font-mono)">Anthropic keys start with <code style="color:var(--accent2)">sk-ant-</code></div>
+
+        <!-- Model override -->
+        <div style="margin-top:.25rem">
+          <label style="font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);display:block;margin-bottom:6px">Model Override (optional)</label>
+          <input type="text" id="settings-model" placeholder="Leave blank to use default model..."
+            style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:.6rem .9rem;color:var(--text);font-family:var(--font-mono);font-size:12px;outline:none"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Provider info cards -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-label"><span class="panel-dot" style="background:var(--blue);box-shadow:0 0 5px var(--blue)"></span>Provider Reference</span>
+      </div>
+      <div style="padding:1.25rem;display:flex;flex-direction:column;gap:.75rem">
+        <div class="provider-ref-row" id="ref-anthropic">
+          <span class="ref-name">Anthropic</span>
+          <span class="ref-detail">console.anthropic.com → API Keys → Create Key</span>
+          <span class="ref-prefix" style="color:#b8acff">sk-ant-…</span>
+        </div>
+        <div class="provider-ref-row" id="ref-openai">
+          <span class="ref-name">OpenAI</span>
+          <span class="ref-detail">platform.openai.com → API keys → Create new secret key</span>
+          <span class="ref-prefix" style="color:#10a37f">sk-…</span>
+        </div>
+        <div class="provider-ref-row" id="ref-groq">
+          <span class="ref-name">Groq</span>
+          <span class="ref-detail">console.groq.com → API Keys → Create API Key</span>
+          <span class="ref-prefix" style="color:#f97316">gsk_…</span>
+        </div>
+        <div class="provider-ref-row" id="ref-gemini">
+          <span class="ref-name">Gemini</span>
+          <span class="ref-detail">aistudio.google.com → Get API key</span>
+          <span class="ref-prefix" style="color:#4285f4">AIza…</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Save button (bottom) -->
+    <div style="margin-top:1.5rem;display:flex;gap:.75rem;align-items:center">
+      <button class="btn btn-primary" onclick="saveSettings()" style="font-size:13.5px;padding:.65rem 1.5rem">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13"/><polyline points="7,3 7,8 15,8"/></svg>
+        Save Settings
+      </button>
+      <button class="btn btn-ghost" onclick="clearSettings()">Clear All</button>
+      <span id="save-status" style="font-family:var(--font-mono);font-size:11px;color:var(--fast);display:none">✓ Saved!</span>
+    </div>
+
+  </div>
+</div>
+<!-- Keyboard shortcuts hint -->
+<div class="kbd-hint" id="kbd-hint">
+  <span><kbd>Ctrl+↵</kbd> Run agent</span>
+  <span><kbd>Ctrl+L</kbd> Load sample</span>
+  <span><kbd>Ctrl+P</kbd> Print</span>
+  <span><kbd>Ctrl+K</kbd> Clear</span>
+</div>
+
+</main>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+/* ══ SAMPLES ══ */
+const SAMPLES=[
+{label:"Fast-track",text:`Policy Number: POL-2024-88231
+Policyholder Name: Rajesh Sharma
+Effective Dates: 01 Jan 2024 – 31 Dec 2024
+Incident Date: 12 May 2026
+Incident Time: 14:30
+Incident Location: MG Road, Bengaluru, Karnataka
+Incident Description: Rear-end collision at traffic signal. Other vehicle failed to brake in time. Minor damage to rear bumper and tail lights.
+Claimant: Rajesh Sharma
+Third Parties: Unknown driver, fled the scene
+Contact Details: +91 98765 43210 | rajesh.sharma@email.com
+Asset Type: Private Motor Vehicle
+Asset ID: KA-01-MF-2233 (2021 Honda City)
+Estimated Damage: 18000
+Claim Type: Property
+Attachments: 3 photos of damage, police complaint copy
+Initial Estimate: 18000`},
+{label:"Fraud Flag",text:`Policy Number: POL-2023-44192
+Policyholder Name: Ananya Krishnan
+Effective Dates: 15 Mar 2023 – 14 Mar 2025
+Incident Date: 10 May 2026
+Incident Time: 09:15
+Incident Location: Koramangala 4th Block, Bengaluru
+Incident Description: Claimant states vehicle was struck from the side. However the incident appears staged — witness accounts are inconsistent with damage patterns. The other driver was known to the claimant.
+Claimant: Ananya Krishnan
+Third Parties: Suresh Pillai (+91 91111 22222)
+Contact Details: +91 91234 56789
+Asset Type: Private Motor Vehicle
+Asset ID: KA-05-HB-7821 (2019 Maruti Swift)
+Estimated Damage: 85000
+Claim Type: Property
+Attachments: 2 photos, no police report
+Initial Estimate: 85000`},
+{label:"Injury",text:`Policy Number: POL-2025-12038
+Policyholder Name: Mohammed Farhan
+Effective Dates: 01 Jun 2025 – 31 May 2026
+Incident Date: 14 May 2026
+Incident Time: 11:40
+Incident Location: Phoenix MarketCity Mall, Whitefield, Bengaluru
+Incident Description: Claimant slipped on wet floor near food court. No wet-floor signage posted. Sustained fractured right wrist and lower back injury. Admitted to Manipal Hospital for 2 days.
+Claimant: Mohammed Farhan
+Third Parties: Phoenix MarketCity Mall Management
+Contact Details: +91 87654 32100 | mfarhan@email.com
+Asset Type: N/A
+Asset ID: N/A
+Estimated Damage: 45000
+Claim Type: Injury
+Attachments: Hospital discharge summary, X-rays (2), medical bills
+Initial Estimate: 45000`},
+{label:"Incomplete",text:`Policy Number: POL-2026-00391
+Policyholder Name: Priya Nair
+Effective Dates: 
+Incident Date: 09 May 2026
+Incident Time: 
+Incident Location: Indiranagar, Bengaluru
+Incident Description: Vehicle found dented in overnight parking lot. Cause unknown.
+Claimant: Priya Nair
+Third Parties: Unknown
+Contact Details: 
+Asset Type: Private Motor Vehicle
+Asset ID: KA-03-NB-9021
+Estimated Damage: 32000
+Claim Type: Property
+Attachments: 
+Initial Estimate: 32000`},
+{label:"High-Value",text:`Policy Number: POL-2024-55876
+Policyholder Name: Suresh Menon
+Effective Dates: 01 Apr 2024 – 31 Mar 2025
+Incident Date: 08 May 2026
+Incident Time: 08:00
+Incident Location: Outer Ring Road, Bengaluru
+Incident Description: Commercial vehicle collided with insured truck. Major structural damage to cab and cargo. Engine likely totaled. Cargo (electronics) also damaged.
+Claimant: Suresh Menon
+Third Parties: KSRTC Bus MH-04-AX-5544
+Contact Details: +91 99887 65432 | suresh.menon@corp.in
+Asset Type: Commercial Vehicle
+Asset ID: KA-09-T-2211 (2022 Tata Prima)
+Estimated Damage: 320000
+Claim Type: Property
+Attachments: 5 photos, FIR copy, cargo manifest
+Initial Estimate: 320000`}
+];
+
+/* ══ STATE ══ */
+const claimsHistory=[];
+let lastResult=null;
+let sIdx=0;
+let jsonOpen=false;
+let currentFile=null;
+let currentTab='text';
+const batchQueue=[];
+const batchResults=[];
+let compareSelected=[];
+let isDark=true;
+
+/* ══ THEME ══ */
+function toggleTheme(){
+  isDark=!isDark;
+  document.body.classList.toggle('light',!isDark);
+  const icon=document.getElementById('theme-icon');
+  if(isDark){
+    icon.innerHTML='<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+  } else {
+    icon.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  }
+  localStorage.setItem('cs_theme',isDark?'dark':'light');
+}
+
+/* ══ PERSISTENT HISTORY ══ */
+const HIST_KEY='cs_history_v4';
+function saveHistory(){
+  try{
+    const data=claimsHistory.map(c=>({...c,ts:c.ts instanceof Date?c.ts.toISOString():c.ts}));
+    localStorage.setItem(HIST_KEY,JSON.stringify(data.slice(0,200)));
+  }catch(e){}
+}
+function loadHistory(){
+  try{
+    const raw=localStorage.getItem(HIST_KEY);
+    if(!raw)return false;
+    const data=JSON.parse(raw);
+    data.forEach(c=>{c.ts=new Date(c.ts);claimsHistory.push(c)});
+    return data.length>0;
+  }catch(e){return false}
+}
+
+/* ══ FRAUD METER ══ */
+const FRAUD_KEYWORDS=['fraud','staged','inconsistent','fabricated','suspicious','duplicate','exaggerated','false','collusion','known to','same vehicle','identical'];
+function computeFraudScore(data){
+  let score=0;
+  const desc=(data.extractedFields?.incidentDescription||'').toLowerCase();
+  const reason=(data.reasoning||'').toLowerCase();
+  const combined=desc+' '+reason;
+  // Keyword hits
+  const hits=FRAUD_KEYWORDS.filter(k=>combined.includes(k));
+  score+=hits.length*15;
+  // Route bonus
+  if(data.recommendedRoute==='Investigation Flag')score+=35;
+  // Low confidence amplifies
+  const oc=data.confidence?.overall??0;
+  if(oc<0.5)score+=20;
+  // Missing fields
+  const miss=(data.missingFields||[]).length;
+  if(miss>4)score+=10;
+  return Math.min(100,Math.round(score));
+}
+function renderFraudMeter(data){
+  const score=computeFraudScore(data);
+  const num=document.getElementById('fraud-score-num');
+  const fill=document.getElementById('fraud-fill');
+  const track=document.getElementById('fraud-track');
+  const verdict=document.getElementById('fraud-verdict');
+  num.textContent=score+'/100';
+  setTimeout(()=>{fill.style.width=score+'%'},50);
+  const wrap=document.getElementById('fraud-meter');
+  wrap.className='fraud-meter-wrap '+(score>=60?'fraud-high':score>=30?'fraud-mid':'fraud-low');
+  track.className='fraud-track';
+  fill.className='fraud-fill';
+  let vColor,vLabel,vIcon;
+  if(score>=60){vColor='var(--red)';vLabel='High Risk — Flag for Investigation';vIcon='🚨';}
+  else if(score>=30){vColor='var(--amber)';vLabel='Medium Risk — Review Carefully';vIcon='⚠️';}
+  else{vColor='var(--fast)';vLabel='Low Risk — Appears Legitimate';vIcon='✓';}
+  num.style.color=vColor;
+  verdict.innerHTML=`<span style="color:${vColor};font-size:15px">${vIcon}</span><span style="color:${vColor}">${vLabel}</span>`;
+}
+
+/* ══ INLINE EDIT ══ */
+const FIELD_KEY_MAP={
+  policyNumber:'Policy №',policyholderName:'Policyholder',effectiveDates:'Effective',
+  incidentDate:'Date',incidentTime:'Time',incidentLocation:'Location',
+  claimantName:'Claimant',contactDetails:'Contact',assetType:'Asset Type',
+  assetId:'Asset ID',estimatedDamage:'Est. Damage',claimType:'Type',
+  attachments:'Attachments',initialEstimate:'Init. Estimate',
+  incidentDescription:'Description',thirdParties:'3rd Parties'
+};
+function makeFieldEditable(el,fieldKey){
+  el.classList.add('editable');
+  el.title='Click to edit';
+  el.onclick=function(e){
+    e.stopPropagation();
+    const current=lastResult?.extractedFields?.[fieldKey]||'';
+    const inp=document.createElement('input');
+    inp.className='field-edit-input';
+    inp.value=current;
+    const orig=el.innerHTML;
+    el.innerHTML='';el.appendChild(inp);
+    inp.focus();inp.select();
+    function save(){
+      const newVal=inp.value.trim();
+      if(lastResult){
+        if(!lastResult.extractedFields)lastResult.extractedFields={};
+        lastResult.extractedFields[fieldKey]=newVal;
+        // Update missing fields list
+        if(newVal&&lastResult.missingFields){
+          lastResult.missingFields=lastResult.missingFields.filter(f=>f!==fieldKey);
+        }
+        // Bump confidence for edited field
+        if(lastResult.confidence?.fields){
+          lastResult.confidence.fields[fieldKey]=newVal?0.9:0;
+        }
+        document.getElementById('json-out').textContent=JSON.stringify(lastResult,null,2);
+        saveHistory();
+        showResult(lastResult);
+        toast('Field updated');
+      }
+    }
+    inp.onkeydown=function(e){
+      if(e.key==='Enter'){e.preventDefault();save();}
+      if(e.key==='Escape'){el.innerHTML=orig;el.classList.add('editable');}
+    };
+    inp.onblur=save;
+  };
+}
+
+/* ══ COMPARE ══ */
+function toggleCompare(id){
+  const idx=compareSelected.indexOf(id);
+  if(idx>-1){compareSelected.splice(idx,1);}
+  else{
+    if(compareSelected.length>=2){compareSelected.shift();}
+    compareSelected.push(id);
+  }
+  renderHistory();
+  const btn=document.getElementById('compare-btn');
+  btn.style.display=compareSelected.length===2?'':'none';
+}
+function openCompare(){
+  if(compareSelected.length!==2)return;
+  const [a,b]=compareSelected.map(id=>claimsHistory.find(x=>x.id===id));
+  if(!a||!b)return;
+  const FKEYS=Object.keys(FIELD_KEY_MAP);
+  const fa=a.extractedFields||{};const fb=b.extractedFields||{};
+  const body=document.getElementById('compare-body');
+  body.innerHTML=`
+    <div class="cmp-col">
+      <div class="cmp-col-head">${a.id} · ${(fa.policyholderName||'Unknown')} · <span style="color:${routeClr(a.recommendedRoute)}">${a.recommendedRoute}</span></div>
+      ${FKEYS.map(k=>{
+        const diff=fa[k]!==fb[k];
+        return`<div class="cmp-field${diff?' diff':''}">
+          <div class="cmp-key">${FIELD_KEY_MAP[k]}${diff?'<span class="cmp-diff-badge">≠</span>':''}</div>
+          <div class="cmp-val">${fa[k]||'—'}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="cmp-col">
+      <div class="cmp-col-head">${b.id} · ${(fb.policyholderName||'Unknown')} · <span style="color:${routeClr(b.recommendedRoute)}">${b.recommendedRoute}</span></div>
+      ${FKEYS.map(k=>{
+        const diff=fa[k]!==fb[k];
+        return`<div class="cmp-field${diff?' diff':''}">
+          <div class="cmp-key">${FIELD_KEY_MAP[k]}${diff?'<span class="cmp-diff-badge">≠</span>':''}</div>
+          <div class="cmp-val">${fb[k]||'—'}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  document.getElementById('compare-modal').style.display='flex';
+}
+function closeCompare(){document.getElementById('compare-modal').style.display='none';}
+
+/* ══ PRINT ══ */
+function printClaim(){
+  if(!lastResult)return;
+  window.print();
+}
+
+/* ══ KEYBOARD SHORTCUTS ══ */
+document.addEventListener('keydown',e=>{
+  const ctrl=e.ctrlKey||e.metaKey;
+  if(ctrl&&e.key==='Enter'){e.preventDefault();runAgent();}
+  if(ctrl&&e.key==='l'){e.preventDefault();loadSample();}
+  if(ctrl&&e.key==='k'){e.preventDefault();clearTA();}
+  if(ctrl&&e.key==='p'&&lastResult){e.preventDefault();printClaim();}
+});
+
+/* ══ SPLASH ══ */
+function runSplash(){
+  document.body.style.overflow='hidden';
+  const bar=document.getElementById('splash-bar');
+  const pct=document.getElementById('splash-pct');
+  const lbl=document.getElementById('progress-label');
+  const sheen=document.getElementById('progress-sheen');
+  
+  const steps=[
+    {delay:280,line:0,pct:18,label:'Loading engine'},
+    {delay:680,line:1,pct:42,label:'Routing ready'},
+    {delay:1020,line:2,pct:62,label:'Scoring enabled'},
+    {delay:1320,line:3,pct:80,label:'Batch online'},
+    {delay:1580,line:4,pct:100,label:'Ready'},
+  ];
+  
+  steps.forEach((s,idx)=>{
+    setTimeout(()=>{
+      document.getElementById('bl'+idx).classList.add('visible');
+      bar.style.width=s.pct+'%';
+      pct.textContent=s.pct+'%';
+      lbl.textContent=s.label;
+      if(s.pct===100){sheen.style.opacity='1'}
+    },s.delay);
+  });
+  
+  setTimeout(()=>{
+    document.getElementById('splash').classList.add('hide');
+    document.body.style.overflow='';
+  },2450);
+}
+
+/* ══ NAV ══ */
+function go(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.querySelector('[data-p="'+p+'"]').classList.add('active');
+  if(p==='history')renderHistory();
+  if(p==='analytics')renderAnalytics();
+  if(p==='batch')renderBatchQueue();
+}
+
+/* ══ PROVIDER CONFIG ══ */
+const PROVIDERS = {
+  anthropic: {
+    name: 'Anthropic',
+    defaultModel: 'claude-sonnet-4-20250514',
+    placeholder: 'sk-ant-api03-...',
+    hint: 'Anthropic keys start with <code style="color:var(--accent2)">sk-ant-</code>',
+    validate: k => k.startsWith('sk-ant-') && k.length > 20,
+  },
+  openai: {
+    name: 'OpenAI',
+    defaultModel: 'gpt-4o',
+    placeholder: 'sk-...',
+    hint: 'OpenAI keys start with <code style="color:#10a37f">sk-</code>',
+    validate: k => k.startsWith('sk-') && k.length > 20,
+  },
+  groq: {
+    name: 'Groq',
+    defaultModel: 'llama-3.3-70b-versatile',
+    placeholder: 'gsk_...',
+    hint: 'Groq keys start with <code style="color:#f97316">gsk_</code>',
+    validate: k => k.startsWith('gsk_') && k.length > 20,
+  },
+  gemini: {
+    name: 'Google Gemini',
+    defaultModel: 'gemini-1.5-flash',
+    placeholder: 'AIzaSy...',
+    hint: 'Gemini keys start with <code style="color:#4285f4">AIza</code>',
+    validate: k => k.startsWith('AIza') && k.length > 20,
+  },
+};
+
+let activeProvider = 'anthropic';
+let savedKey = '';
+let savedModel = '';
+
+/* ══ SETTINGS FUNCTIONS ══ */
+function selectProvider(p) {
+  activeProvider = p;
+  // Update card visuals
+  document.querySelectorAll('.provider-card').forEach(c => {
+    c.classList.toggle('active', c.dataset.provider === p);
+  });
+  Object.keys(PROVIDERS).forEach(k => {
+    document.getElementById('check-' + k).style.display = k === p ? '' : 'none';
+  });
+  // Update hint & placeholder
+  const cfg = PROVIDERS[p];
+  document.getElementById('settings-api-key').placeholder = cfg.placeholder;
+  document.getElementById('key-hint').innerHTML = cfg.hint;
+  // Update model placeholder
+  document.getElementById('settings-model').placeholder = 'Default: ' + cfg.defaultModel;
+  onSettingsKeyInput();
+}
+
+function onSettingsKeyInput() {
+  const k = document.getElementById('settings-api-key').value.trim();
+  const cfg = PROVIDERS[activeProvider];
+  const valid = cfg.validate(k);
+  document.getElementById('settings-api-dot').classList.toggle('ready', valid);
+}
+
+function toggleKeyVisibility() {
+  const inp = document.getElementById('settings-api-key');
+  const icon = document.getElementById('eye-icon');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  } else {
+    inp.type = 'password';
+    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+}
+
+function saveSettings() {
+  const key = document.getElementById('settings-api-key').value.trim();
+  const model = document.getElementById('settings-model').value.trim();
+  if (!key) { toast('Please enter an API key first'); return; }
+  const cfg = PROVIDERS[activeProvider];
+  if (!cfg.validate(key)) { toast('API key format looks incorrect for ' + cfg.name); return; }
+
+  savedKey = key;
+  savedModel = model;
+  sessionStorage.setItem('cs_provider', activeProvider);
+  sessionStorage.setItem('cs_key', key);
+  sessionStorage.setItem('cs_model', model);
+
+  // Update sidebar
+  updateSidebarStatus();
+
+  // Show badge on nav
+  document.getElementById('settings-badge').style.display = '';
+
+  // Show save confirmation
+  const st = document.getElementById('save-status');
+  st.style.display = '';
+  setTimeout(() => { st.style.display = 'none'; }, 2500);
+
+  toast('✓ ' + cfg.name + ' API key saved!');
+}
+
+function clearSettings() {
+  document.getElementById('settings-api-key').value = '';
+  document.getElementById('settings-model').value = '';
+  savedKey = '';
+  savedModel = '';
+  sessionStorage.removeItem('cs_provider');
+  sessionStorage.removeItem('cs_key');
+  sessionStorage.removeItem('cs_model');
+  document.getElementById('settings-api-dot').classList.remove('ready');
+  document.getElementById('settings-badge').style.display = 'none';
+  updateSidebarStatus();
+  toast('Settings cleared');
+}
+
+function updateSidebarStatus() {
+  const key = savedKey;
+  const cfg = PROVIDERS[activeProvider];
+  const valid = key && cfg.validate(key);
+  document.getElementById('api-dot').classList.toggle('ready', !!valid);
+  document.getElementById('provider-label-mini').textContent = cfg.name + ' API KEY';
+  document.getElementById('active-model-line').textContent = valid
+    ? (savedModel || cfg.defaultModel)
+    : 'No provider configured';
+  document.getElementById('key-status-mini').textContent = valid
+    ? '●●●●●●●●' + key.slice(-4)
+    : 'Configure in API Settings →';
+}
+
+function loadSettingsFromStorage() {
+  const p = sessionStorage.getItem('cs_provider');
+  const k = sessionStorage.getItem('cs_key');
+  const m = sessionStorage.getItem('cs_model');
+  if (p && PROVIDERS[p]) {
+    activeProvider = p;
+    selectProvider(p);
+  }
+  if (k) {
+    savedKey = k;
+    document.getElementById('settings-api-key').value = k;
+    onSettingsKeyInput();
+  }
+  if (m) {
+    savedModel = m;
+    document.getElementById('settings-model').value = m;
+  }
+  if (k) {
+    document.getElementById('settings-badge').style.display = '';
+    updateSidebarStatus();
+  }
+}
+
+function getKey() { return savedKey || sessionStorage.getItem('cs_key') || ''; }
+function getActiveProvider() { return activeProvider; }
+function getActiveModel() {
+  return savedModel || sessionStorage.getItem('cs_model') || PROVIDERS[activeProvider].defaultModel;
+}
+
+/* ══ API KEY (legacy compat) ══ */
+function checkKey() {}
+
+/* ══ INPUT TABS ══ */
+function switchTab(t){
+  currentTab=t;
+  document.querySelectorAll('.input-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  document.getElementById('pane-'+t).classList.add('active');
+}
+
+/* ══ FILE HANDLING ══ */
+function handleDragOver(e){e.preventDefault();document.getElementById('upload-zone').classList.add('drag-over')}
+function handleDragLeave(e){document.getElementById('upload-zone').classList.remove('drag-over')}
+function handleDrop(e){
+  e.preventDefault();document.getElementById('upload-zone').classList.remove('drag-over');
+  const f=e.dataTransfer.files[0];if(f)processFile(f);
+}
+function handleFileSelect(e){const f=e.target.files[0];if(f)processFile(f)}
+
+async function processFile(f){
+  currentFile=f;
+  document.getElementById('file-name').textContent=f.name;
+  document.getElementById('file-size').textContent=formatBytes(f.size);
+  document.getElementById('file-preview').classList.add('visible');
+  try{
+    let text='';
+    if(f.type==='application/pdf'||f.name.endsWith('.pdf')){
+      text=await extractPDF(f);
+    } else {
+      text=await f.text();
+    }
+    document.getElementById('ta').value=text;
+    switchTab('text');
+    toast('File loaded — '+f.name);
+  }catch(e){toast('Error reading file: '+e.message)}
+}
+
+async function extractPDF(f){
+  const buf=await f.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+  let t='';
+  for(let i=1;i<=pdf.numPages;i++){
+    const pg=await pdf.getPage(i);
+    const c=await pg.getTextContent();
+    t+=c.items.map(x=>x.str).join(' ')+'\n';
+  }
+  return t.trim();
+}
+
+function clearFile(){
+  currentFile=null;
+  document.getElementById('file-input').value='';
+  document.getElementById('file-preview').classList.remove('visible');
+  document.getElementById('file-name').textContent='—';
+  document.getElementById('file-size').textContent='—';
+}
+
+function formatBytes(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB'}
+
+/* ══ SAMPLES ══ */
+function loadSample(){loadIdx(sIdx++%SAMPLES.length)}
+function loadIdx(i){switchTab('text');document.getElementById('ta').value=SAMPLES[i].text}
+function clearTA(){document.getElementById('ta').value='';showEmpty()}
+
+/* ══ UI STATES ══ */
+function showEmpty(){
+  document.getElementById('st-empty').style.display='';
+  document.getElementById('st-load').style.display='none';
+  document.getElementById('st-result').style.display='none';
+  document.getElementById('out-acts').style.opacity='0';
+  document.getElementById('out-acts').style.pointerEvents='none';
+  document.getElementById('out-dot').style.background='var(--text3)';
+  document.getElementById('out-dot').style.boxShadow='none';
+}
+
+const LTEXTS=['Extracting fields...','Checking mandatory fields...','Applying routing rules...','Scoring confidence...','Generating reasoning...'];
+let ltimer=null;
+let stepTimer=null;
+let stepIdx=0;
+
+function showLoading(){
+  document.getElementById('st-empty').style.display='none';
+  document.getElementById('st-load').style.display='flex';
+  document.getElementById('st-result').style.display='none';
+  
+  // Reset steps
+  stepIdx=0;
+  for(let i=0;i<5;i++){
+    const el=document.getElementById('ls-'+i);
+    if(el){el.classList.remove('active','done')}
+  }
+  
+  // Cycle main text
+  let li=0;
+  document.getElementById('load-txt').textContent=LTEXTS[0];
+  ltimer=setInterval(()=>{
+    li++;
+    const el=document.getElementById('load-txt');
+    if(el)el.textContent=LTEXTS[li%LTEXTS.length];
+  },900);
+  
+  // Progress through steps
+  function advanceStep(){
+    if(stepIdx>0){
+      const prev=document.getElementById('ls-'+(stepIdx-1));
+      if(prev){prev.classList.remove('active');prev.classList.add('done')}
+    }
+    const cur=document.getElementById('ls-'+stepIdx);
+    if(cur){cur.classList.add('active')}
+    stepIdx++;
+    if(stepIdx<=5)stepTimer=setTimeout(advanceStep,800);
+  }
+  advanceStep();
+}
+
+/* ══ ROUTE ICONS ══ */
+function routeIconSVG(route){
+  const s='stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
+  if(route==='Fast-track')return`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" ${s}><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg>`;
+  if(route==='Investigation Flag')return`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" ${s}><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>`;
+  if(route==='Specialist Queue')return`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" ${s}><path d="M8 2v4M16 2v4M3 10h18M3 6h18a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"/><path d="M12 14v4M10 16h4"/></svg>`;
+  return`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" ${s}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+}
+
+/* ══ RESULT ══ */
+function showResult(data){
+  clearInterval(ltimer);
+  clearTimeout(stepTimer);
+  // Mark all steps done
+  for(let i=0;i<5;i++){
+    const el=document.getElementById('ls-'+i);
+    if(el){el.classList.remove('active');el.classList.add('done')}
+  }
+  
+  document.getElementById('st-empty').style.display='none';
+  document.getElementById('st-load').style.display='none';
+  document.getElementById('st-result').style.display='flex';
+  document.getElementById('out-acts').style.opacity='1';
+  document.getElementById('out-acts').style.pointerEvents='';
+  document.getElementById('out-dot').style.background='var(--accent2)';
+  document.getElementById('out-dot').style.boxShadow='0 0 6px var(--accent)';
+
+  const route=data.recommendedRoute||'Manual Review';
+  const missing=data.missingFields||[];
+  const fields=data.extractedFields||{};
+  const conf=data.confidence||{};
+
+  const card=document.getElementById('r-card');
+  card.className='route-card '+routeCls(route);
+  
+  // Set route icon
+  document.getElementById('r-icon-wrap').innerHTML=routeIconSVG(route);
+  
+  document.getElementById('r-name').textContent=route;
+  document.getElementById('r-name').style.color=routeClr(route);
+
+  const oc=conf.overall!==undefined?conf.overall:calcConf(missing,fields);
+  const cp=Math.round(oc*100);
+  const cf=document.getElementById('conf-fill');
+  cf.style.width=cp+'%';
+  cf.className='conf-fill'+(cp>=70?'':cp>=40?' mid':' low');
+  document.getElementById('conf-pct').textContent=cp+'%';
+
+  const strength={'Fast-track':5,'Investigation Flag':8,'Specialist Queue':6,'Manual Review':3}[route]||4;
+  ['bar-row-1','bar-row-2','bar-row-3'].forEach((id,ri)=>{
+    const row=document.getElementById(id);row.innerHTML='';
+    const cnt=[5,4,3][ri];
+    for(let i=0;i<cnt;i++){
+      const seg=document.createElement('div');seg.className='bar-seg';
+      seg.style.color=routeClr(route);row.appendChild(seg);
+      if(i<Math.ceil(strength*(cnt/5)))setTimeout(()=>seg.classList.add('lit'),i*70+ri*100);
+    }
+  });
+
+  document.getElementById('r-reason').textContent=data.reasoning||'';
+
+  const mb=document.getElementById('miss-box');
+  if(missing.length){
+    mb.style.display='';
+    document.getElementById('miss-chips').innerHTML=missing.map(f=>`<span class="miss-chip">${f}</span>`).join('');
+  } else mb.style.display='none';
+
+  const FKEYS=[
+    ['policyNumber','Policy №'],['policyholderName','Policyholder'],['effectiveDates','Effective'],
+    ['incidentDate','Date'],['incidentTime','Time'],['incidentLocation','Location'],
+    ['claimantName','Claimant'],['contactDetails','Contact'],['assetType','Asset Type'],
+    ['assetId','Asset ID'],['estimatedDamage','Est. Damage'],['claimType','Type'],
+    ['attachments','Attachments'],['initialEstimate','Init. Estimate'],
+    ['incidentDescription','Description'],['thirdParties','3rd Parties']
+  ];
+  const fg=document.getElementById('fields-grid');
+  const fc=conf.fields||{};
+  fg.innerHTML=FKEYS.map(([k,lbl])=>{
+    const v=fields[k]||'';
+    const isMiss=!v||missing.includes(k);
+    const fcp=fc[k]!==undefined?fc[k]:(!isMiss?.8:0);
+    const cls=fcp>=.7?'hi':fcp>=.4?'mid':'lo';
+    const pctStr=!isMiss?`<span class="field-conf ${cls}">${Math.round(fcp*100)}%</span>`:'';
+    let disp=v||'—';
+    if((k==='estimatedDamage'||k==='initialEstimate')&&v){
+      const n=parseFloat(v.replace(/[₹,]/g,''));
+      if(!isNaN(n))disp='₹'+n.toLocaleString('en-IN');
+    }
+    return`<div class="field-row" data-fkey="${k}"><span class="field-key">${lbl}</span><span class="field-val${isMiss?' missing':''}" id="fval-${k}">${disp}</span>${pctStr}</div>`;
+  }).join('');
+  // Make field values editable
+  FKEYS.forEach(([k])=>{
+    const el=document.getElementById('fval-'+k);
+    if(el)makeFieldEditable(el,k);
+  });
+
+  lastResult=data;
+  document.getElementById('json-out').textContent=JSON.stringify(data,null,2);
+
+  // Render fraud meter
+  renderFraudMeter(data);
+}
+
+function calcConf(missing,fields){
+  const total=16;
+  const present=Object.values(fields).filter(v=>v&&v!=='N/A'&&String(v).trim()!=='').length;
+  return Math.min(1,present/total);
+}
+
+/* ══ HELPERS ══ */
+function routeCls(r){if(r==='Fast-track')return'fast';if(r==='Investigation Flag')return'fraud';if(r==='Specialist Queue')return'injury';return'manual'}
+function routeClr(r){return{'Fast-track':'var(--fast)','Investigation Flag':'var(--red)','Specialist Queue':'var(--blue)','Manual Review':'var(--amber)'}[r]||'var(--amber)'}
+
+/* ══ JSON ══ */
+function toggleJSON(){jsonOpen=!jsonOpen;document.getElementById('json-body').style.display=jsonOpen?'':'none';document.getElementById('json-tog').classList.toggle('open',jsonOpen)}
+function copyJSON(){if(lastResult)navigator.clipboard.writeText(JSON.stringify(lastResult,null,2)).then(()=>toast('JSON copied!')).catch(()=>{})}
+function exportSingleJSON(){
+  if(!lastResult){toast('No result yet');return}
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(lastResult,null,2)],{type:'application/json'}));
+  a.download='fnol-'+Date.now()+'.json';a.click();toast('JSON exported!');
+}
+
+/* ══ TOAST ══ */
+function toast(msg){
+  const t=document.createElement('div');t.className='toast';
+  t.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg>${msg}`;
+  document.body.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)';t.style.transition='all .3s';setTimeout(()=>t.remove(),300)},2200);
+}
+
+/* ══ SYSTEM PROMPT ══ */
+const SYS=`You are an autonomous insurance claims processing agent for an Indian insurance company.
+
+Extract all fields from the FNOL document and apply routing rules. Also provide per-field confidence scores.
+
+MANDATORY FIELDS (all 16):
+policyNumber, policyholderName, effectiveDates, incidentDate, incidentTime,
+incidentLocation, incidentDescription, claimantName, thirdParties, contactDetails,
+assetType, assetId, estimatedDamage, claimType, attachments, initialEstimate
+
+A field is "missing" if blank, empty, not provided, or "N/A" where a real value is expected.
+
+ROUTING RULES — apply in STRICT priority order:
+1. description contains fraud/staged/inconsistent/fabricated → "Investigation Flag"
+2. claimType = "Injury" → "Specialist Queue"
+3. any mandatory field missing → "Manual Review"
+4. estimatedDamage < 25000 → "Fast-track"
+5. otherwise → "Manual Review"
+
+CONFIDENCE SCORING:
+- Per field (0.0–1.0): 0.95=clearly stated, 0.7=inferred, 0.4=ambiguous, 0.0=missing
+- Overall: weighted average
+
+Return ONLY raw JSON, no markdown, no backticks:
+{"extractedFields":{"policyNumber":"","policyholderName":"","effectiveDates":"","incidentDate":"","incidentTime":"","incidentLocation":"","incidentDescription":"","claimantName":"","thirdParties":"","contactDetails":"","assetType":"","assetId":"","estimatedDamage":"","claimType":"","attachments":"","initialEstimate":""},"missingFields":[],"recommendedRoute":"","reasoning":"","confidence":{"overall":0.0,"fields":{"policyNumber":0.0,"policyholderName":0.0,"effectiveDates":0.0,"incidentDate":0.0,"incidentTime":0.0,"incidentLocation":0.0,"incidentDescription":0.0,"claimantName":0.0,"thirdParties":0.0,"contactDetails":0.0,"assetType":0.0,"assetId":0.0,"estimatedDamage":0.0,"claimType":0.0,"attachments":0.0,"initialEstimate":0.0}}}`;
+
+/* ══ AGENT ══ */
+async function runAgent(){
+  const text=document.getElementById('ta').value.trim();
+  if(!text){alert('Please paste a FNOL document or upload a file first.');return}
+  const key=getKey();
+  if(!key){
+    toast('No API key configured — go to API Settings');
+    go('settings');
+    return;
+  }
+  const cfg=PROVIDERS[activeProvider];
+  if(!cfg.validate(key)){
+    alert('Please enter a valid '+cfg.name+' API key in API Settings.');
+    go('settings');
+    return;
+  }
+  const btn=document.getElementById('run-btn');
+  btn.disabled=true;showLoading();
+  try{
+    const data=await callAgent(text,key);
+    btn.disabled=false;
+    showResult(data);addToHistory(data);
+  }catch(e){
+    clearInterval(ltimer);clearTimeout(stepTimer);btn.disabled=false;showEmpty();
+    alert('Agent error: '+(e.message||'Check API key and try again'));
+  }
+}
+
+async function callAgent(text,key){
+  const k=key||getKey();
+  const provider=getActiveProvider();
+  const model=getActiveModel();
+
+  if(provider==='anthropic'){
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model,max_tokens:1500,system:SYS,messages:[{role:'user',content:'Process this FNOL:\n\n'+text}]})
+    });
+    const d=await res.json();
+    if(d.error)throw new Error(d.error.message||'Anthropic API error');
+    const raw=(d.content||[]).map(b=>b.text||'').join('');
+    return JSON.parse(raw.replace(/```json\n?|```/g,'').trim());
+  }
+
+  if(provider==='openai'){
+    const res=await fetch('https://api.openai.com/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},
+      body:JSON.stringify({model,max_tokens:1500,messages:[{role:'system',content:SYS},{role:'user',content:'Process this FNOL:\n\n'+text}],response_format:{type:'json_object'}})
+    });
+    const d=await res.json();
+    if(d.error)throw new Error(d.error.message||'OpenAI API error');
+    const raw=d.choices?.[0]?.message?.content||'';
+    return JSON.parse(raw.replace(/```json\n?|```/g,'').trim());
+  }
+
+  if(provider==='groq'){
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},
+      body:JSON.stringify({model,max_tokens:1500,messages:[{role:'system',content:SYS},{role:'user',content:'Process this FNOL:\n\n'+text}],response_format:{type:'json_object'}})
+    });
+    const d=await res.json();
+    if(d.error)throw new Error(d.error.message||'Groq API error');
+    const raw=d.choices?.[0]?.message?.content||'';
+    return JSON.parse(raw.replace(/```json\n?|```/g,'').trim());
+  }
+
+  if(provider==='gemini'){
+    const geminiModel=model||'gemini-1.5-flash';
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${k}`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        systemInstruction:{parts:[{text:SYS}]},
+        contents:[{role:'user',parts:[{text:'Process this FNOL:\n\n'+text}]}],
+        generationConfig:{responseMimeType:'application/json',maxOutputTokens:1500}
+      })
+    });
+    const d=await res.json();
+    if(d.error)throw new Error(d.error.message||'Gemini API error');
+    const raw=d.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    return JSON.parse(raw.replace(/```json\n?|```/g,'').trim());
+  }
+
+  throw new Error('Unknown provider: '+provider);
+}
+
+
+/* ══ HISTORY ══ */
+function addToHistory(data){
+  claimsHistory.unshift({...data,ts:new Date(),id:'CLM-'+Math.random().toString(36).substr(2,6).toUpperCase()});
+  const b=document.getElementById('hist-badge');b.style.display='';b.textContent=claimsHistory.length;
+  saveHistory();
+}
+
+function renderHistory(){
+  const listEl=document.getElementById('hist-list');
+  const statEl=document.getElementById('stat-row');
+  if(!claimsHistory.length){
+    statEl.innerHTML='';
+    listEl.innerHTML=`<div class="empty-hist"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.18"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg><p>No claims processed yet.<br/>Go to <strong>Process FNOL</strong> to begin.</p></div>`;
+    return;
+  }
+  const cnt={'Fast-track':0,'Investigation Flag':0,'Specialist Queue':0,'Manual Review':0};
+  claimsHistory.forEach(c=>{cnt[c.recommendedRoute]=(cnt[c.recommendedRoute]||0)+1});
+  statEl.innerHTML=`
+    <div class="stat-card all"><div class="stat-label">Total Processed</div><div class="stat-val">${claimsHistory.length}</div></div>
+    <div class="stat-card fast-s"><div class="stat-label">Fast-tracked</div><div class="stat-val" style="color:var(--fast)">${cnt['Fast-track']}</div></div>
+    <div class="stat-card flag-s"><div class="stat-label">Flagged</div><div class="stat-val" style="color:var(--red)">${cnt['Investigation Flag']}</div></div>
+    <div class="stat-card review-s"><div class="stat-label">Manual / Specialist</div><div class="stat-val" style="color:var(--amber)">${cnt['Manual Review']+cnt['Specialist Queue']}</div></div>`;
+  listEl.innerHTML=claimsHistory.map(c=>{
+    const f=c.extractedFields||{};
+    const clr=routeClr(c.recommendedRoute);
+    const t=c.ts instanceof Date?c.ts.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):c.ts;
+    const cp=c.confidence?.overall!==undefined?Math.round(c.confidence.overall*100):null;
+    const dmg=parseInt(f.estimatedDamage||0);
+    const isCmpSel=compareSelected.includes(c.id);
+    const fraud=computeFraudScore(c);
+    const fraudClr=fraud>=60?'var(--red)':fraud>=30?'var(--amber)':'var(--fast)';
+    return`<div class="hist-card">
+      <div class="hist-compare-check ${isCmpSel?'checked':''}" onclick="toggleCompare('${c.id}')" title="Select to compare">${isCmpSel?'✓':''}</div>
+      <div class="hist-dot" style="background:${clr};color:${clr}"></div>
+      <div class="hist-info" onclick="viewHist('${c.id}')" style="cursor:pointer">
+        <div class="hist-policy">${f.policyNumber||'Unknown'} · ${c.id}</div>
+        <div class="hist-holder">${f.policyholderName||'—'} · ${f.claimType||'—'} · ₹${dmg.toLocaleString('en-IN')}</div>
+      </div>
+      <span style="font-family:var(--font-mono);font-size:9px;color:${fraudClr};flex-shrink:0" title="Fraud risk score">⚠ ${fraud}</span>
+      <span class="hist-badge" style="background:${clr}18;color:${clr};border:1px solid ${clr}30">${c.recommendedRoute}</span>
+      ${cp!==null?`<span class="hist-conf">${cp}%</span>`:''}
+      <span class="hist-time">${t}</span>
+    </div>`;
+  }).join('');
+}
+
+function viewHist(id){
+  const c=claimsHistory.find(x=>x.id===id);if(!c)return;
+  go('process');showResult(c);
+}
+
+function clearHist(){
+  claimsHistory.length=0;
+  compareSelected=[];
+  document.getElementById('hist-badge').style.display='none';
+  document.getElementById('compare-btn').style.display='none';
+  localStorage.removeItem(HIST_KEY);
+  renderHistory();toast('History cleared');
+}
+
+function exportHist(){
+  if(!claimsHistory.length){toast('No claims to export');return}
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(claimsHistory,null,2)],{type:'application/json'}));
+  a.download='fnol-claims-'+Date.now()+'.json';a.click();toast('JSON exported!');
+}
+
+function exportCSV(){
+  if(!claimsHistory.length){toast('No claims to export');return}
+  const headers=['ID','Timestamp','PolicyNumber','PolicyholderName','EffectiveDates','IncidentDate','IncidentTime','IncidentLocation','IncidentDescription','ClaimantName','ThirdParties','ContactDetails','AssetType','AssetID','EstimatedDamage','ClaimType','Attachments','InitialEstimate','MissingFields','RecommendedRoute','Confidence','Reasoning'];
+  const rows=claimsHistory.map(c=>{
+    const f=c.extractedFields||{};
+    const cp=c.confidence?.overall!==undefined?Math.round(c.confidence.overall*100)+'%':'';
+    return[c.id,c.ts.toISOString(),f.policyNumber,f.policyholderName,f.effectiveDates,f.incidentDate,f.incidentTime,f.incidentLocation,f.incidentDescription,f.claimantName,f.thirdParties,f.contactDetails,f.assetType,f.assetId,f.estimatedDamage,f.claimType,f.attachments,f.initialEstimate,(c.missingFields||[]).join('; '),c.recommendedRoute,cp,c.reasoning]
+      .map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`);
+  });
+  const csv=[headers.join(','),...rows.map(r=>r.join(','))].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='fnol-claims-'+Date.now()+'.csv';a.click();toast('CSV exported!');
+}
+
+/* ══ BATCH ══ */
+function handleBatchDragOver(e){e.preventDefault();document.getElementById('batch-drop').classList.add('drag-over')}
+function handleBatchDragLeave(e){document.getElementById('batch-drop').classList.remove('drag-over')}
+function handleBatchDrop(e){e.preventDefault();document.getElementById('batch-drop').classList.remove('drag-over');Array.from(e.dataTransfer.files).forEach(f=>addToBatchQueue(f))}
+function handleBatchSelect(e){Array.from(e.target.files).forEach(f=>addToBatchQueue(f))}
+
+function addToBatchQueue(f){
+  const id='BF-'+Math.random().toString(36).substr(2,5);
+  batchQueue.push({id,file:f,status:'pending',result:null});
+  const b=document.getElementById('batch-badge');b.style.display='';b.textContent=batchQueue.length;
+  renderBatchQueue();
+}
+
+function renderBatchQueue(){
+  const el=document.getElementById('batch-queue');
+  if(!batchQueue.length){el.style.display='none';return}
+  el.style.display='flex';
+  el.innerHTML=batchQueue.map(item=>`
+    <div class="batch-item">
+      <div class="batch-item-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent2)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14,2 14,8 20,8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+      </div>
+      <div class="batch-item-name">${item.file.name}</div>
+      <div class="batch-item-size">${formatBytes(item.file.size)}</div>
+      <span class="batch-status bs-${item.status}">${{pending:'Queued',processing:'Processing...',done:'Done',error:'Error'}[item.status]}</span>
+      ${item.status==='pending'?`<button class="batch-item-remove" onclick="removeBatchItem('${item.id}')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`:''}
+    </div>`).join('');
+}
+
+function removeBatchItem(id){
+  const i=batchQueue.findIndex(x=>x.id===id);
+  if(i>-1)batchQueue.splice(i,1);
+  const b=document.getElementById('batch-badge');
+  if(!batchQueue.length)b.style.display='none';else b.textContent=batchQueue.length;
+  renderBatchQueue();
+}
+
+function clearBatch(){
+  batchQueue.length=0;batchResults.length=0;
+  document.getElementById('batch-badge').style.display='none';
+  document.getElementById('batch-results-section').style.display='none';
+  document.getElementById('batch-file-input').value='';
+  renderBatchQueue();toast('Batch cleared');
+}
+
+async function runBatch(){
+  if(!batchQueue.length){alert('No files in queue.');return}
+  const key=getKey();
+  if(!key){toast('No API key configured — go to API Settings');go('settings');return}
+  const cfg=PROVIDERS[activeProvider];
+  if(!cfg.validate(key)){alert('Please enter a valid '+cfg.name+' API key in API Settings.');go('settings');return}
+  const pending=batchQueue.filter(x=>x.status==='pending');
+  if(!pending.length){toast('All files already processed.');return}
+  document.getElementById('batch-run-btn').disabled=true;
+  batchResults.length=0;
+  for(const item of pending){
+    item.status='processing';renderBatchQueue();
+    try{
+      const text=await item.file.text();
+      const result=await callAgent(text,key);
+      item.result=result;item.status='done';
+      const entry={...result,ts:new Date(),id:'CLM-'+Math.random().toString(36).substr(2,6).toUpperCase(),sourceFile:item.file.name};
+      claimsHistory.unshift(entry);
+      batchResults.push({file:item.file.name,...result});
+    }catch(e){item.status='error';item.error=e.message}
+    renderBatchQueue();
+    await new Promise(r=>setTimeout(r,700));
+  }
+  const b=document.getElementById('hist-badge');b.style.display='';b.textContent=claimsHistory.length;
+  document.getElementById('batch-run-btn').disabled=false;
+  renderBatchResults();
+  toast('Batch complete! '+pending.length+' claims processed.');
+}
+
+function renderBatchResults(){
+  const sec=document.getElementById('batch-results-section');
+  const con=document.getElementById('batch-results');
+  if(!batchResults.length){sec.style.display='none';return}
+  sec.style.display='';
+  con.innerHTML=batchResults.map(r=>{
+    const f=r.extractedFields||{};
+    const clr=routeClr(r.recommendedRoute);
+    const missing=r.missingFields||[];
+    const dmg=parseInt(f.estimatedDamage||0);
+    return`<div class="batch-result-card" onclick="viewBatchResult('${r.file}')">
+      <div class="brc-header">
+        <span class="brc-filename">${r.file}</span>
+        <span class="brc-route" style="background:${clr}18;color:${clr};border:1px solid ${clr}30">${r.recommendedRoute}</span>
+      </div>
+      <div class="brc-fields">
+        <span class="brc-field"><strong>${f.policyholderName||'—'}</strong></span>
+        <span class="brc-field">Policy: <strong>${f.policyNumber||'—'}</strong></span>
+        <span class="brc-field">₹<strong>${dmg.toLocaleString('en-IN')}</strong></span>
+        ${missing.length?`<span class="brc-field" style="color:var(--amber)">⚠ ${missing.length} missing</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function viewBatchResult(filename){
+  const r=batchResults.find(x=>x.file===filename);if(!r)return;
+  go('process');showResult(r);
+}
+
+function exportBatchJSON(){
+  if(!batchResults.length){toast('No batch results yet');return}
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(batchResults,null,2)],{type:'application/json'}));
+  a.download='fnol-batch-'+Date.now()+'.json';a.click();toast('Batch JSON exported!');
+}
+
+function exportBatchCSV(){
+  if(!batchResults.length){toast('No batch results yet');return}
+  const headers=['File','PolicyNumber','PolicyholderName','EstimatedDamage','ClaimType','MissingFields','RecommendedRoute','Confidence','Reasoning'];
+  const rows=batchResults.map(r=>{
+    const f=r.extractedFields||{};
+    const cp=r.confidence?.overall!==undefined?Math.round(r.confidence.overall*100)+'%':'';
+    return[r.file,f.policyNumber,f.policyholderName,f.estimatedDamage,f.claimType,(r.missingFields||[]).join('; '),r.recommendedRoute,cp,r.reasoning]
+      .map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`);
+  });
+  const csv=[headers.join(','),...rows.map(r=>r.join(','))].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='fnol-batch-'+Date.now()+'.csv';a.click();toast('Batch CSV exported!');
+}
+
+/* ══ ANALYTICS ══ */
+function renderAnalytics(){
+  const data=claimsHistory;
+  const kpiRow=document.getElementById('kpi-row');
+  if(!data.length){
+    kpiRow.innerHTML='<div style="grid-column:1/-1"><div class="analytics-empty"><p>Process some FNOL claims first to see analytics.</p></div></div>';
+    ['donut-wrap','bar-chart-wrap','damage-chart-wrap','missing-chart-wrap'].forEach(id=>{document.getElementById(id).innerHTML='<div class="analytics-empty"><p>No data yet</p></div>'});
+    return;
+  }
+
+  const totalDmg=data.reduce((s,c)=>s+parseInt(c.extractedFields?.estimatedDamage||0),0);
+  const confItems=data.filter(c=>c.confidence?.overall!==undefined);
+  const avgConf=confItems.length?confItems.reduce((s,c)=>s+c.confidence.overall,0)/confItems.length:0;
+  const avgMiss=data.reduce((s,c)=>s+(c.missingFields?.length||0),0)/data.length;
+  kpiRow.innerHTML=`
+    <div class="kpi-card"><div class="kpi-label">Total Claims</div><div class="kpi-val">${data.length}</div><div class="kpi-sub">processed this session</div></div>
+    <div class="kpi-card"><div class="kpi-label">Total Damage (₹)</div><div class="kpi-val">${totalDmg>=100000?(totalDmg/100000).toFixed(1)+'L':totalDmg.toLocaleString('en-IN')}</div><div class="kpi-sub">across all claims</div></div>
+    <div class="kpi-card"><div class="kpi-label">Avg. Confidence</div><div class="kpi-val">${Math.round(avgConf*100)}%</div><div class="kpi-sub">avg missing: ${avgMiss.toFixed(1)} fields</div></div>`;
+
+  const rc={'Fast-track':0,'Investigation Flag':0,'Specialist Queue':0,'Manual Review':0};
+  data.forEach(c=>{rc[c.recommendedRoute]=(rc[c.recommendedRoute]||0)+1});
+  const rclrs={'Fast-track':'#00e5a0','Investigation Flag':'#ff3d5a','Specialist Queue':'#22d3ee','Manual Review':'#f59e0b'};
+  const total=data.length;let ca=0;
+  const paths=Object.entries(rc).filter(([,v])=>v>0).map(([k,v])=>{
+    const pct=v/total,start=ca;ca+=pct*360;
+    return{label:k,count:v,pct,start,end:ca,color:rclrs[k]};
+  });
+  function arc(cx,cy,r,a1,a2){
+    if(a2-a1>=360)a2-=.001;
+    const p2c=(cx,cy,r,deg)=>{const rd=(deg-90)*Math.PI/180;return{x:cx+r*Math.cos(rd),y:cy+r*Math.sin(rd)}};
+    const s=p2c(cx,cy,r,a1),e=p2c(cx,cy,r,a2);
+    return`M${cx},${cy} L${s.x},${s.y} A${r},${r},0,${a2-a1>180?1:0},1,${e.x},${e.y} Z`;
+  }
+  document.getElementById('donut-wrap').innerHTML=`<div class="donut-wrap">
+    <svg width="125" height="125" viewBox="0 0 125 125">${paths.map(p=>`<path d="${arc(62.5,62.5,52,p.start,p.end)}" fill="${p.color}" opacity=".85"/>`).join('')}
+    <circle cx="62.5" cy="62.5" r="30" fill="var(--bg2)"/>
+    <text x="62.5" y="58" text-anchor="middle" font-family="Fraunces,serif" font-size="18" font-weight="900" fill="white">${total}</text>
+    <text x="62.5" y="72" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#2e2e52" letter-spacing="1">CLAIMS</text></svg>
+    <div class="donut-legend">${Object.entries(rc).map(([k,v])=>`<div class="legend-row"><div class="legend-dot" style="background:${rclrs[k]}"></div><span class="legend-label">${k}</span><span class="legend-val">${v}</span></div>`).join('')}</div>
+  </div>`;
+
+  const cc={};data.forEach(c=>{const n=c.extractedFields?.policyholderName||'Unknown';cc[n]=(cc[n]||0)+1});
+  const top=Object.entries(cc).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const maxC=top[0]?.[1]||1;
+  document.getElementById('bar-chart-wrap').innerHTML=`<div class="bar-chart">${top.map(([name,cnt])=>`<div class="bchart-row"><div class="bchart-label" title="${name}">${name.split(' ')[0]}</div><div class="bchart-track"><div class="bchart-fill" style="width:${Math.round(cnt/maxC*100)}%;background:var(--accent);opacity:.75"><span class="bchart-val">${cnt}</span></div></div></div>`).join('')}</div>`;
+
+  const buckets=[{l:'<10K',min:0,max:10000},{l:'10-25K',min:10000,max:25000},{l:'25-50K',min:25000,max:50000},{l:'50-100K',min:50000,max:100000},{l:'100-300K',min:100000,max:300000},{l:'>300K',min:300000,max:Infinity}];
+  const bkc=buckets.map(b=>({...b,count:data.filter(c=>{const v=parseInt(c.extractedFields?.estimatedDamage||0);return v>=b.min&&v<b.max}).length}));
+  const maxBk=Math.max(1,...bkc.map(b=>b.count));
+  const dmgClrs=['#00e5a0','#00c090','#66bb8a','#f59e0b','#ff7f50','#ff3d5a'];
+  document.getElementById('damage-chart-wrap').innerHTML=`<div class="damage-chart">${bkc.map((b,i)=>`<div class="damage-bar-wrap"><div class="damage-bar" style="height:${Math.max(4,Math.round(b.count/maxBk*80))}px;background:${dmgClrs[i]}"></div><div class="damage-label">${b.l}</div></div>`).join('')}</div>`;
+
+  const mc={};data.forEach(c=>(c.missingFields||[]).forEach(f=>{mc[f]=(mc[f]||0)+1}));
+  const topM=Object.entries(mc).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  if(!topM.length){document.getElementById('missing-chart-wrap').innerHTML='<div class="analytics-empty"><p>No missing fields detected ✓</p></div>'}
+  else{
+    const maxM=topM[0][1];
+    document.getElementById('missing-chart-wrap').innerHTML=`<div class="bar-chart">${topM.map(([f,cnt])=>`<div class="bchart-row"><div class="bchart-label" title="${f}">${f.replace(/([A-Z])/g,' $1').trim().split(' ').pop()}</div><div class="bchart-track"><div class="bchart-fill" style="width:${Math.round(cnt/maxM*100)}%;background:var(--amber);opacity:.7"><span class="bchart-val">${cnt}</span></div></div></div>`).join('')}</div>`;
+  }
+}
+
+/* ══ INIT ══ */
+document.addEventListener('DOMContentLoaded',()=>{
+  // Load theme
+  const savedTheme=localStorage.getItem('cs_theme');
+  if(savedTheme==='light'){isDark=false;document.body.classList.add('light');const icon=document.getElementById('theme-icon');icon.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';}
+  // Load persistent history
+  const hadHistory=loadHistory();
+  if(hadHistory){
+    const b=document.getElementById('hist-badge');b.style.display='';b.textContent=claimsHistory.length;
+    const banner=document.getElementById('storage-banner');
+    if(banner){banner.style.display='flex';document.getElementById('storage-banner-txt').textContent=`${claimsHistory.length} claim${claimsHistory.length>1?'s':''} loaded from previous session`;}
+  }
+  // Load API settings
+  selectProvider('anthropic');
+  loadSettingsFromStorage();
+  // Boot
+  runSplash();
+});
+</script>
+</body>
+</html>
