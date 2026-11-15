@@ -2,6 +2,11 @@
 
 # ClaimSense v4: AI-Powered Autonomous Insurance Claims & FNOL Processing Agent
 
+[![ClaimSense CI](https://github.com/vachan18/claimsense---Autonomous-Insurance-Claims-Processing-Agent/actions/workflows/ci.yml/badge.svg)](https://github.com/vachan18/claimsense---Autonomous-Insurance-Claims-Processing-Agent/actions/workflows/ci.yml)
+[![Live App](https://img.shields.io/badge/Live_App-Netlify-00C7B7?logo=netlify&logoColor=white)](https://claimsense.netlify.app/)
+[![Node.js CI](https://img.shields.io/badge/Node.js-20%2B-green?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 ## LIVE DEPLOYMENT LINK - https://claimsense.netlify.app/
 
 A single-file, zero-install, browser-based AI platform for processing First Notice of Loss (FNOL) insurance claims. Open the HTML file, configure your API key, and start processing claims in seconds.
